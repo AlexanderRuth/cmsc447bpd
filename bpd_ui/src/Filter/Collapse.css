@@ -1,0 +1,18 @@
+.collapse-header {
+	background-color: #EAAB00; /*MD Gold*/
+	color: black;
+	width: 100%;
+	border: 1px solid black;
+}
+
+.collapse-body {
+	background-color: #F5EA74; /*Light Gold*/
+	padding: 0;
+	margin: 0;
+	border: 1px solid black;
+}
+
+.collapse-header:hover {
+	cursor: pointer;
+	background-color: #FFAB00;
+}

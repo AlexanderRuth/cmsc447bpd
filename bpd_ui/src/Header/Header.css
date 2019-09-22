@@ -1,0 +1,21 @@
+.header-item {
+	float: left;
+	color: white;
+	background-color: black;
+	height: 100%;
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 100px;       /* The same as your div height */
+}
+
+/*Clickable header items*/
+.header-item.clickable {
+	
+}
+
+.header-item.clickable:hover {
+	background-color: grey;
+	cursor: pointer;
+}
