@@ -1,0 +1,16 @@
+td {
+	border: 1px solid black;
+}
+
+tr {
+	border: 1px solid black;
+}
+
+th {
+	border: 1px solid black;
+	background-color: #9C9C9C;
+}
+
+tr:hover {
+	background-color: #ECECEC;
+}

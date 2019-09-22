@@ -15,7 +15,7 @@ export default class Filter extends React.Component
 	render()
 	{
 		return(
-			<div>
+			<div style={{width: "30%", float: "right"}}>
 				<div style={{backgroundColor: "gold", height: "30px"}}>
 					Filters
 				</div>

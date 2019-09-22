@@ -9,7 +9,6 @@ export default class Map extends React.Component
 		return(
 		<div>
 			<img src={bmore_map} style={{width: "70%", height: "550px", overflow: "hidden", float: "left"}}/>
-			<Filter/>
 		</div>
 		);
 	}
