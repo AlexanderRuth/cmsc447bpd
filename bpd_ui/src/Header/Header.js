@@ -22,7 +22,7 @@ export default class Header extends React.Component
 					(<Link to={headerItems[e]} className="header-item clickable">{e}</Link>)
 				)}
 				
-				<span className="header-item" style={{fontSize: "30px", float: "right", paddingRight: "40px", color: "lightgrey"}}>Open BPD</span>
+				<span className="header-item" style={{fontSize: "30px", float: "right", paddingRight: "40px", color: "lightgrey"}}>CrimeStats v0.1</span>
 			</div>
 		);
 	}
