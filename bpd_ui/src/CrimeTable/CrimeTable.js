@@ -1,37 +1,46 @@
 import React from 'react';
 import Filter from "../Filter/Filter.js";
 import "./CrimeTable.css";
+import test_data from '../test_data/crimes.json';
 
-const headers = ["Foos", "Bars", "FooBars", "BooFars", "Spams", "Camalots"];
-const rows = [
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-		["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-		["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-		["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-	["Foo", "Bar", "FooBar", "BooFar", "Spam", "Camalot"],
-]
+const headers = Object.keys(test_data[0]);
+const PAGE_COUNT = 10;
 
 export default class CrimeTable extends React.Component
 {	
+	constructor()
+	{
+		super();
+		
+		this.state = {
+			page: 1
+		}
+	}
 	render()
 	{
+		var rows = [];
+		
+		for(var i = PAGE_COUNT*(this.state.page-1); i < PAGE_COUNT*(this.state.page); i++)
+		{
+			var row = [];
+			if(test_data[i])
+			{				
+				for(var j = 0; j < headers.length; j++)
+				{
+					row.push(test_data[i][headers[j]] ? test_data[i][headers[j]] : "n/a");
+				}
+			rows.push(row);
+			}
+		}
 		return(
 		<div>
-			<table style={{float: "left", width: "70%", border: "1"}}>
+			<div className="taskbar">
+				<button onClick={() => {this.setState({page: this.state.page-=1})}}>Prev</button>
+				<button onClick={() => {this.setState({page: this.state.page+=1})}}>Next</button>
+				<br/>
+				Page: {this.state.page}
+			</div>
+			<table>
 			<tr>
 			{headers.map( (row) => <th>{row}</th>)}
 			</tr>

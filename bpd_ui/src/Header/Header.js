@@ -15,8 +15,8 @@ export default class Header extends React.Component
 	render()
 	{
 		return(
-			<div style={{backgroundColor: "black", width: "100%", height: "100px", display: "block"}}>
-				<img src={logo} style={{height: "80px", float: "left", paddingTop: "10px", paddingLeft: "10px"}}/>
+			<div style={{backgroundColor: "black",height: "100%", display: "block"}}>
+				<img src={logo} style={{height: "12vh", float: "left", paddingTop: "1vh", paddingLeft: "15px"}}/>
 				
 				{Object.keys(headerItems).map( (e) => 
 					(<Link to={headerItems[e]} className="header-item clickable">{e}</Link>)

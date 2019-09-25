@@ -15,15 +15,19 @@ export default class Filter extends React.Component
 	render()
 	{
 		return(
-			<div style={{width: "30%", float: "right"}}>
+			<div style={{}}>
 				<div style={{backgroundColor: "gold", height: "30px"}}>
 					Filters
 				</div>
 				<Collapse title="Time">
 					<form style={{width: "100%", textAlign: "left"}}>
-						Committed After: <input type="date"/> <input type="time"/> EST
+						Committed After: 
 						<br/>
-						Committed Before: <input type="date"/> <input type="time"/> EST
+						<input type="date"/> <input type="time"/> EST
+						<br/>
+						Committed Before: 
+						<br/>
+						<input type="date"/> <input type="time"/> EST
 					</form>
 				</Collapse>
 				<Collapse title="Crimes">

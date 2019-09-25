@@ -1,9 +1,15 @@
+table{
+	width: 100%;
+	border: 1;
+	
+}
 td {
 	border: 1px solid black;
 }
 
 tr {
 	border: 1px solid black;
+	font-size: 12px;
 }
 
 th {
@@ -13,4 +19,10 @@ th {
 
 tr:hover {
 	background-color: #ECECEC;
+}
+
+.taskbar {
+	width: 100%;
+	display: block;
+	background-color: #9C9C9C;
 }
