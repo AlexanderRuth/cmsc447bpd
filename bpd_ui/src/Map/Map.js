@@ -58,7 +58,7 @@ export default class Map extends React.Component
 		<div style={{height: "87vh", width: "100%"}}>
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
-				bootstrapURLKeys={{key: "AIzaSyAb2DQ97vUtf5SekHnVp5Mh-UcXsJ_26tU"}}
+				bootstrapURLKeys={{key: "API_KEY_HERE"}}
 				defaultCenter={this.props.center}
 				defaultZoom={this.props.zoom}
 				options={{scrollwheel: true, zoomControl: true}}
