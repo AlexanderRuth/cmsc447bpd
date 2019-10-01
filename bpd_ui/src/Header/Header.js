@@ -5,9 +5,7 @@ import {Link} from "react-router-dom";
 
 var headerItems = {
 	"Home": "/home",
-	"Charts": "/charts",
-	"Tables": "/tables",
-	"Help": "/help"
+	"Help": "/help",
 }
 
 export default class Header extends React.Component

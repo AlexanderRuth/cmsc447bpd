@@ -2,9 +2,14 @@ import React from 'react';
 import Filter from "../Filter/Filter.js";
 import "./CrimeTable.css";
 import test_data from '../test_data/crimes.json';
+import {MDBDataTable} from 'mdbreact';
+import ReactTable from 'react-table';
+import 'react-table/react-table.css';
 
-const headers = Object.keys(test_data[0]);
+const headers = ["crimedate", "crimetime", "crimecode", "location", "description", "inside_outside", "weapon", "post", "district", "neighborhood", "longitude", "latitude", "premise", "vri_name1", "total_incidents"]
 const PAGE_COUNT = 10;
+
+
 
 export default class CrimeTable extends React.Component
 {	
@@ -13,39 +18,42 @@ export default class CrimeTable extends React.Component
 		super();
 		
 		this.state = {
-			page: 1
-		}
-	}
-	render()
-	{
-		var rows = [];
-		
-		for(var i = PAGE_COUNT*(this.state.page-1); i < PAGE_COUNT*(this.state.page); i++)
-		{
-			var row = [];
-			if(test_data[i])
-			{				
-				for(var j = 0; j < headers.length; j++)
-				{
-					row.push(test_data[i][headers[j]] ? test_data[i][headers[j]] : "n/a");
-				}
-			rows.push(row);
+			page: 1,
+			data: {
+				columns:
+					headers.map( (key) => {
+						return {Header: key,
+						accessor: key.toLowerCase(),
+						sort: 'asc',
+						width: 100
+						}
+					}),
+				rows: JSON.parse(JSON.stringify(test_data)).map(
+					(entry) => {
+						for(var i = 0; i < headers.length; i++)
+						{
+							if(!entry[headers[i]])
+							{
+								entry[headers[i]] = "N/A"
+							}
+						}
+						return entry;
+					}
+				)
 			}
 		}
+		
+		console.log(this.state.data)
+	}
+	
+	render()
+	{
 		return(
-		<div>
-			<div className="taskbar">
-				<button onClick={() => {this.setState({page: this.state.page-=1})}}>Prev</button>
-				<button onClick={() => {this.setState({page: this.state.page+=1})}}>Next</button>
-				<br/>
-				Page: {this.state.page}
-			</div>
-			<table>
-			<tr>
-			{headers.map( (row) => <th>{row}</th>)}
-			</tr>
-			{rows.map( (row) => <tr>{row.map( (col) => <td>{col}</td>)}</tr>)}
-			</table>
+		<div style={{width: "100%"}}>
+		<ReactTable
+			data={this.state.data.rows}
+			columns={this.state.data.columns} 
+			defaultPageSize={5}/>
 		</div>
 		);
 	}

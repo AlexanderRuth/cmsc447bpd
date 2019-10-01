@@ -55,10 +55,10 @@ export default class Map extends React.Component
 	{
 		const heatmap = createHeatmap();
 		return(
-		<div style={{height: "87vh", width: "100%"}}>
+		<div style={{height: "100%", width: "100%"}}>
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
-				bootstrapURLKeys={{key: "API_KEY_HERE"}}
+				bootstrapURLKeys={{key: "API_GOES_HERE"}}
 				defaultCenter={this.props.center}
 				defaultZoom={this.props.zoom}
 				options={{scrollwheel: true, zoomControl: true}}
