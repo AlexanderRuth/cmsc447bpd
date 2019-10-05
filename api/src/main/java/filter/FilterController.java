@@ -25,6 +25,7 @@ public class FilterController {
 		return "Hi";
 	}
 	
+	//Sample: /filterbydate?crimecode=4C&crimedate=2019-09-18
     @GetMapping(path="/filterbydate")
     public @ResponseBody Iterable<Crime> filterByDate(@RequestParam(name = "crimecode") String crimecode, @RequestParam(name = "crimedate") @DateTimeFormat(pattern="yyyy-mm-dd") java.util.Date crimedate) {
             return crimeRepository.findAllByCrimecodeAndCrimedate(crimecode, crimedate);
