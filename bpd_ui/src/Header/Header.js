@@ -21,6 +21,7 @@ export default class Header extends React.Component
 				)}
 				
 				<span className="header-item" style={{fontSize: "30px", float: "right", paddingRight: "40px", color: "lightgrey"}}>CrimeStats v0.1</span>
+				
 			</div>
 		);
 	}

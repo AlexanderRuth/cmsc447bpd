@@ -1,6 +1,7 @@
 import React from 'react';
 import bmore_map from "../img/baltimore.jpg";
 import Collapse from "./Collapse.js";
+import './Collapse.css';
 
 export default class Filter extends React.Component
 {
@@ -15,12 +16,13 @@ export default class Filter extends React.Component
 	render()
 	{
 		return(
-			<div style={{}}>
-				<div style={{backgroundColor: "gold", height: "30px"}}>
+			<div style={{width: "100%", backgroundColor: "black", height: "13vh"}}>
+				<div className="filter-button" onClick={() => {this.setState({show: !this.state.show})}}>
 					Filters
 				</div>
+				<div style={{display: this.state.show ? "" : "none", position: "absolute", top: "13vh", zIndex: 2, right: 0, width: "30%"}}>
 				<Collapse title="Time">
-					<form style={{width: "100%", textAlign: "left"}}>
+					<form style={{textAlign: "left"}}>
 						Committed After: 
 						<br/>
 						<input type="date"/> <input type="time"/> EST
@@ -31,7 +33,7 @@ export default class Filter extends React.Component
 					</form>
 				</Collapse>
 				<Collapse title="Crimes">
-					<form style={{width: "100%", textAlign: "left"}}>
+					<form style={{textAlign: "left"}}>
 						Name:<br/>
 						<select>
 							<option value="Foo">Foo</option>
@@ -44,7 +46,7 @@ export default class Filter extends React.Component
 					</form>
 				</Collapse>
 				<Collapse title="Attributes">
-					<form style={{width: "100%", textAlign: "left"}}>
+					<form style={{textAlign: "left"}}>
 						Name:<br/>
 						<select>
 							<option value="Foo">Foo</option>
@@ -56,6 +58,7 @@ export default class Filter extends React.Component
 						<input type="checkbox" name="gender" value="other"/> Other
 					</form>
 				</Collapse>
+				</div>
 			</div>
 		);
 	}

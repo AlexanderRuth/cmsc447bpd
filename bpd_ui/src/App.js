@@ -21,8 +21,11 @@ function App() {
 		<Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
 		<Router>
 			<Row fluid style={{height: "13vh", margin: 0}}>
-				<Col style={{padding: 0}}>
+				<Col style={{padding: 0}} md={3}>
 					<Header />
+				</Col>
+				<Col style={{padding: 0}} md={9}>
+					<Filter/>
 				</Col>
 			</Row>
 			

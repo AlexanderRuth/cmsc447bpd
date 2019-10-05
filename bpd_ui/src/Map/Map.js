@@ -8,6 +8,7 @@ import "./CrimeMarker.css";
 /*
 				heatmapLibrary={true}         
 				heatmap={JSON.parse(JSON.stringify(this.state.heatmap))
+"AIzaSyCHwvB9HjPI1_K9jR0B3ly3mmPswvXXWJc"
 */
 function createHeatmap()
 	{
@@ -58,7 +59,7 @@ export default class Map extends React.Component
 		<div style={{height: "100%", width: "100%"}}>
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
-				bootstrapURLKeys={{key: "AIzaSyCHwvB9HjPI1_K9jR0B3ly3mmPswvXXWJc"}}
+				bootstrapURLKeys={{key: "API_KEY_HERE"}}
 				defaultCenter={this.props.center}
 				defaultZoom={this.props.zoom}
 				options={{scrollwheel: true, zoomControl: true}}

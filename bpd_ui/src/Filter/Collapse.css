@@ -1,10 +1,7 @@
 .collapse-header {
 	background-color: #EAAB00; /*MD Gold*/
 	color: black;
-	width: 100%;
 	border: 1px solid black;
-	border-right: none;
-	border-left: none;
 }
 
 .collapse-body {
@@ -12,11 +9,26 @@
 	padding: 0;
 	margin: 0;
 	border: 1px solid black;
-	border-right: none;
-	border-left: none;
 }
 
 .collapse-header:hover {
+	cursor: pointer;
+	background-color: #FFAB00;
+}
+
+.filter-button {
+	background-color: gold;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	position: relative;
+	top: 3vh;
+	right: 20px;
+	float: right;
+	border-radius: 50%;
+}
+
+.filter-button:hover {
 	cursor: pointer;
 	background-color: #FFAB00;
 }
