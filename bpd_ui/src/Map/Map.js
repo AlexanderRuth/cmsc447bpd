@@ -46,7 +46,8 @@ export default class Map extends React.Component
 	{
 		super()
 		this.state = {
-			heatmap: createHeatmap()
+			heatmap: createHeatmap(),
+			show: null
 		}
 		
 		console.log(this.state.heatmap)
@@ -55,8 +56,12 @@ export default class Map extends React.Component
 	render()
 	{
 		const heatmap = createHeatmap();
+		console.log(this.state);
 		return(
 		<div style={{height: "100%", width: "100%"}}>
+			<div style={{color: "black", position: 'absolute', top: 0, right: 0, zIndex: 2}}>
+				{this.state.show ? JSON.stringify(this.state.show) : ""}
+			</div>
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
 				bootstrapURLKeys={{key: "API_KEY_HERE"}}
@@ -83,7 +88,9 @@ export default class Map extends React.Component
 				markers.push(
 					<div className="crime-marker"
 						lat={test_data[i]["latitude"]}
-						lng={test_data[i]["longitude"]}>
+						lng={test_data[i]["longitude"]}
+						onMouseOver={() => {this.setState({show: test_data[i]})}}
+						onMouseOff={()=>{this.setState({show: null})}}>
 					</div>
 				);
 		}

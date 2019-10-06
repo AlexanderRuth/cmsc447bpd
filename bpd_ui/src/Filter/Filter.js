@@ -11,6 +11,8 @@ export default class Filter extends React.Component
 	{
 		super();
 		
+		//show: Whether to show the filter options or not
+		//form: The form parameters to send to the API
 		this.state = {
 			show: false,
 			form: {
@@ -29,13 +31,15 @@ export default class Filter extends React.Component
 	render()
 	{
 		return(
-			<div style={{width: "100%", backgroundColor: "black", height: "13vh"}}>
+			<div style={{width: "100%", backgroundColor: "black", height: "100%"}}>
+
+				{/*Button to open/close filter*/}
 				<div className="filter-button" onClick={() => {this.setState({show: !this.state.show})}}>
 					Filters
 				</div>
 				<div style={{display: this.state.show ? "" : "none", position: "absolute", top: "13vh", zIndex: 2, right: 0, width: "30%"}}>
+				
 				<form style={{textAlign: "left"}}>
-
 				<Collapse title="Time">
 						Committed After: 
 						<br/>
@@ -81,18 +85,17 @@ export default class Filter extends React.Component
 	updateForm(e)
 	{
 		//Update the particular entry
+		//FOR TESTING: Add a crimedate
 		this.setState({
 			form: Object.assign(this.state.form, {[e.target.name]: e.target.value, crimedate: "2018-09-18"})
-		})
+		});
 
-		console.log("Form update: ", this.state.form);
-
+		//Prepare the query parameters and URL
 		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(this.state.form).map(
 			(param) => {
 				return param + "=" + this.state.form[param];
 			}).join("&");
 
-		console.log("URL = ", URL);
 		//Submit the form data
 		fetch(
 			URL,
@@ -104,6 +107,7 @@ export default class Filter extends React.Component
 		).then(
 			(response) => response.json()
 		).then(
+			//Send it over to Redux
 			(response) => console.log("Response: ", response)
 		)
 	}
