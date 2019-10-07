@@ -4,6 +4,7 @@ import Filter from "../Filter/Filter.js";
 import GoogleMapReact from 'google-map-react';
 import test_data from '../test_data/crimes.json';
 import "./CrimeMarker.css";
+import * as Constants from '../constants/constants.js';
 
 /*
 				heatmapLibrary={true}         
@@ -64,7 +65,7 @@ export default class Map extends React.Component
 			</div>
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
-				bootstrapURLKeys={{key: "API_KEY_HERE"}}
+				bootstrapURLKeys={{key: Constants.API_KEY}}
 				defaultCenter={this.props.center}
 				defaultZoom={this.props.zoom}
 				options={{scrollwheel: true, zoomControl: true}}
