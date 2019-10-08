@@ -2,6 +2,15 @@ import React from 'react';
 import bmore_map from "../img/baltimore.jpg";
 import "./Collapse.css";
 
+/*
+	Displays a clickable header that hides a provided div
+
+	Example:
+		<Collapse title="Greeting">
+			<div>Hello World!</div>
+		</Collapse>
+*/
+
 export default class Collapse extends React.Component
 {
 	constructor()

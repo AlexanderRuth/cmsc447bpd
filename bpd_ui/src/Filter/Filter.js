@@ -4,8 +4,16 @@ import Collapse from "./Collapse.js";
 import './Collapse.css';
 import fetch from 'isomorphic-fetch';
 import * as Constants from '../constants/constants.js';
+import { connect } from 'react-redux';
+import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 
-export default class Filter extends React.Component
+/*
+	Filter Form that displays alongside the webpage header. Collapsables appear on click, which
+	then contain form data. When data is off focused or changed, an API call is initiated, and the
+	Redux store is updated.
+*/
+
+class Filter extends React.Component
 {
 	constructor()
 	{
@@ -96,6 +104,9 @@ export default class Filter extends React.Component
 				return param + "=" + this.state.form[param];
 			}).join("&");
 
+		//Indicate that a crime request is being made
+		this.props.crimeRequest();
+
 		//Submit the form data
 		fetch(
 			URL,
@@ -107,8 +118,18 @@ export default class Filter extends React.Component
 		).then(
 			(response) => response.json()
 		).then(
-			//Send it over to Redux
-			(response) => console.log("Response: ", response)
+			//Store the response
+			(response) => {this.props.crimeResponse(response)}
 		)
 	}
 }
+
+const mapStateToProps = state => ({
+})
+
+const mapDispatchToProps = dispatch => ({
+	crimeRequest: () => dispatch(crimeRequest()),
+	crimeResponse: (data) => dispatch(crimeResponse(data))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Filter);
