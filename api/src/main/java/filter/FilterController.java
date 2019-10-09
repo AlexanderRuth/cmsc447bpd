@@ -49,7 +49,8 @@ public class FilterController {
     public @ResponseBody Iterable<Crime> findByAllFilters(@RequestParam(name = "crimecode", required=false) String crimecode, 
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
-    	@RequestParam(name = "weapon", required=false) String weapon) {
+    	@RequestParam(name = "weapon", required=false) String weapon,
+    	@RequestParam(name = "district", required=false) String district) {
    
     	//Apply before and after filters as needed
     	if(before != null) {
@@ -65,6 +66,7 @@ public class FilterController {
     	Crime crime = new Crime();
     	crime.setCrimecode(crimecode);
     	crime.setWeapon(weapon);
+    	crime.setDistrict(district);
     
     	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime)); 	
     	
