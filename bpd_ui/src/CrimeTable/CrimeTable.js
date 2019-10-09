@@ -7,7 +7,7 @@ import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import { connect } from 'react-redux';
 
-const headers = ["crimedate", "crimetime", "crimecode", "location", "description", "inside_outside", "weapon", "post", "district", "neighborhood", "longitude", "latitude", "premise", "vri_name1", "total_incidents"]
+const headers = ["crimedate", "crimetime", "crimecode", "location", "description", "inside_outside", "weapon", "post", "district", "neighborhood", "longitude", "latitude", "premise", "total_incidents"]
 const PAGE_COUNT = 10;
 
 
@@ -21,13 +21,15 @@ class CrimeTable extends React.Component
 	
 	render()
 	{
-		console.log("PROPS: ", this.props)
 		return(
-		<div style={{width: "100%"}}>
-		<ReactTable
-			data={this.dataToRow(this.props.data)}
-			columns={this.dataToColumn()} 
-			defaultPageSize={5}/>
+		<div>
+			{this.props.loading ? <div className="loader"/> : null}
+			<div style={{width: "100%", filter: this.props.loading ? "blur(5px)" : ""}}>
+				<ReactTable
+					data={this.dataToRow(this.props.data)}
+					columns={this.dataToColumn()} 
+					defaultPageSize={5}/>
+			</div>
 		</div>
 		);
 	}
@@ -66,7 +68,8 @@ class CrimeTable extends React.Component
 
 const mapStateToProps = (state) => {
 	return {
-		data: state.crimeReducer.crimes
+		data: state.crimeReducer.crimes,
+		loading: state.crimeReducer.loading
 	}
 }
 

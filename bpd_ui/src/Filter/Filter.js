@@ -24,8 +24,8 @@ class Filter extends React.Component
 		this.state = {
 			show: false,
 			form: {
-				before_date: "",
-				after_date: "",
+				before: "",
+				after: "",
 				before_time: "",
 				after_time: "",
 				district: "All",
@@ -95,11 +95,15 @@ class Filter extends React.Component
 		//Update the particular entry
 		//FOR TESTING: Add a crimedate
 		this.setState({
-			form: Object.assign(this.state.form, {[e.target.name]: e.target.value, crimedate: "2018-09-18"})
+			form: Object.assign(this.state.form, {[e.target.name]: e.target.value})
 		});
 
 		//Prepare the query parameters and URL
-		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(this.state.form).map(
+		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(this.state.form).filter(
+			(param) => {
+				return this.state.form[param] != "" && this.state.form[param].toLowerCase() != "all"
+			}
+			).map(
 			(param) => {
 				return param + "=" + this.state.form[param];
 			}).join("&");

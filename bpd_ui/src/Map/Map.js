@@ -5,6 +5,7 @@ import GoogleMapReact from 'google-map-react';
 import test_data from '../test_data/crimes.json';
 import "./CrimeMarker.css";
 import * as Constants from '../constants/constants.js';
+import {connect} from 'react-redux';
 
 /*
 				heatmapLibrary={true}         
@@ -33,7 +34,7 @@ function createHeatmap()
 		return heatmapData;
 	}
 	
-export default class Map extends React.Component
+class CrimeMap extends React.Component
 {	
 	static defaultProps = {
 		center: {
@@ -52,6 +53,8 @@ export default class Map extends React.Component
 		}
 		
 		console.log(this.state.heatmap)
+
+		this.createMarkers = this.createMarkers.bind(this);
 	}
 	
 	render()
@@ -61,7 +64,7 @@ export default class Map extends React.Component
 		return(
 		<div style={{height: "100%", width: "100%"}}>
 			<div style={{color: "black", position: 'absolute', top: 0, right: 0, zIndex: 2}}>
-				{this.state.show ? JSON.stringify(this.state.show) : ""}
+				{this.state.show ? JSON.stringify(this.props.data[this.state.show]) : ""}
 			</div>
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
@@ -81,17 +84,18 @@ export default class Map extends React.Component
 	createMarkers()
 	{
 		var markers = [];
-		let mark = test_data
+		let mark = this.props.data || [];
 		
 		for(var i = 0; i < mark.length; i++)
 		{
-			if(test_data[i]["latitude"] & test_data[i]["longitude"])
+			if(mark[i]["latitude"] && mark[i]["longitude"])
 				markers.push(
 					<div className="crime-marker"
-						lat={test_data[i]["latitude"]}
-						lng={test_data[i]["longitude"]}
-						onMouseOver={() => {this.setState({show: test_data[i]})}}
-						onMouseOff={()=>{this.setState({show: null})}}>
+						lat={mark[i]["latitude"]}
+						lng={mark[i]["longitude"]}
+						onMouseOver={(e) => {this.setState({show: e.target.id})}}
+						onMouseOff={()=>{this.setState({show: null})}}
+						id={i}>
 					</div>
 				);
 		}
@@ -100,3 +104,11 @@ export default class Map extends React.Component
 	}
 	
 }
+
+const mapStateToProps = (state) => {
+	return {
+		data: state.crimeReducer.crimes
+	}
+}
+
+export default connect(mapStateToProps)(CrimeMap);
