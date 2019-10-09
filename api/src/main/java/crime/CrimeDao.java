@@ -1,6 +1,7 @@
 package crime;
 
-import org.springframework.data.domain.Example;
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
 import org.springframework.stereotype.Repository;
@@ -26,8 +27,22 @@ import crime.Crime;
  */
 
 @Repository
-public interface CrimeRepository extends CrudRepository<Crime, Integer> {
-        Iterable<Crime> findAllByCrimecode(String crimecode);
-        Iterable<Crime> findAllByCrimecodeAndCrimedate(String crimecode, java.util.Date date);
-        Iterable<Crime> findAll(Example<Crime> example);
+public class CrimeDao {
+        List<Crime> findAllByAll(java.sql.Date crimedate,
+        							 java.sql.Time crimetime,
+        							 String crimecode,
+        							 String location,
+        							 String description,
+        							 String inside_outside,
+        							 String weapon,
+        							 Integer post,
+        							 String district,
+        							 String neighborhood,
+        							 Double longitude,
+        							 Double latitude,
+        							 String premise,
+        							 Integer total_incidents)
+        {
+        	return null;
+        }
 }
