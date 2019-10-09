@@ -13,6 +13,8 @@ import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 	Redux store is updated.
 */
 
+const DISTRICTS = ["ALL", "NORTHERN", "NORTHEAST", "NORTHWEST", "SOUTHERN", "SOUTEAST", "SOUTHWEST", "CENTRAL", "EASTERN", "WESTERN"];
+
 class Filter extends React.Component
 {
 	constructor()
@@ -78,9 +80,9 @@ class Filter extends React.Component
 					District: 
 					<br/>
 					<select onChange={this.updateForm} name="district">
-						<option>All</option>
-						<option>Southeast</option>
-						<option>Central</option>
+						{DISTRICTS.map( (entry) => 
+							<option>{entry}</option>
+						)}
 					</select>
 				</Collapse>
 				</form>
