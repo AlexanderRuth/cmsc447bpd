@@ -1,3 +1,4 @@
+/* global google */
 import React from 'react';
 import bmore_map from "../img/baltimore.jpg";
 import Filter from "../Filter/Filter.js";
@@ -12,27 +13,6 @@ import {connect} from 'react-redux';
 				heatmap={JSON.parse(JSON.stringify(this.state.heatmap))
 "AIzaSyCHwvB9HjPI1_K9jR0B3ly3mmPswvXXWJc"
 */
-function createHeatmap()
-	{
-		var heatmapData = {
-			positions: [],
-			options: {
-				radius: 30,
-				opacity: .9
-			}
-		}
-		
-		for(var i = 0; i < test_data.length; i++)
-		{
-			heatmapData.positions.push({
-				lat: parseFloat(parseFloat(test_data[i]["latitude"])),
-				lng: parseFloat(parseFloat(test_data[i]["longitude"]))
-			})
-		}
-		
-		console.log(heatmapData);
-		return heatmapData;
-	}
 	
 class CrimeMap extends React.Component
 {	
@@ -48,32 +28,37 @@ class CrimeMap extends React.Component
 	{
 		super()
 		this.state = {
-			heatmap: createHeatmap(),
-			show: null
+			heatmap: null,
+			show: null,
+			googlemap: null,
+			googlemaps: null
 		}
 		
 		console.log(this.state.heatmap)
 
 		this.createMarkers = this.createMarkers.bind(this);
+		this.handleApiLoaded = this.handleApiLoaded.bind(this);
 	}
+
 	
 	render()
 	{
-		const heatmap = createHeatmap();
-		console.log(this.state);
 		return(
-		<div style={{height: "100%", width: "100%"}}>
+		<div style={{height: "100%", width: "100%", filter: this.props.loading ? "blur(1px)" : ""}}>
 			<div style={{color: "black", position: 'absolute', top: 0, right: 0, zIndex: 2}}>
 				{this.state.show ? JSON.stringify(this.props.data[this.state.show]) : ""}
 			</div>
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
+				yesIWantToUseGoogleMapApiInternals
 				bootstrapURLKeys={{key: Constants.API_KEY}}
 				defaultCenter={this.props.center}
 				defaultZoom={this.props.zoom}
 				options={{scrollwheel: true, zoomControl: true}}
+				heatmapLibrary={true}         
+				heatmap={this.createHeatmap(this.props.data)}
+				onGoogleApiLoaded={(map, maps) => this.handleApiLoaded(map, maps)}
 			>
-			{this.createMarkers()}
 			</GoogleMapReact>
 		
 		{/*<img src={bmore_map} style={{width: "70%", height: "550px", overflow: "hidden", float: "left"}}/>*/}
@@ -102,12 +87,50 @@ class CrimeMap extends React.Component
 		
 		return markers;
 	}
+
+	createHeatmap(data)
+	{
+		console.log("CREATING HEATMAP")
+		if(!data)
+			return {positions: []}
+		
+		var heatmapData = {
+			positions: [],
+			options: {
+				radius: 50,
+				opacity: 1
+			}
+		}
+		
+		for(var i = 0; i < data.length; i++)
+		{
+			heatmapData.positions.push({
+				lat: parseFloat(parseFloat(data[i]["latitude"])),
+				lng: parseFloat(parseFloat(data[i]["longitude"]))
+			})
+		}
+		
+		console.log(heatmapData);
+		return heatmapData;
+	}
+
+	handleApiLoaded(map, maps)
+	{
+		console.log(map, maps);
+		this.setState({
+			googlemap: map.map,
+			googlemaps: map.maps
+		})
+
+		console.log("STATE: ", this.state);
+	}
 	
 }
 
 const mapStateToProps = (state) => {
 	return {
-		data: state.crimeReducer.crimes
+		data: state.crimeReducer.crimes,
+		loading: state.crimeReducer.loading
 	}
 }
 

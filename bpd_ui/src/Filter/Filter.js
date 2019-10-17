@@ -13,7 +13,7 @@ import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 	Redux store is updated.
 */
 
-const DISTRICTS = ["ALL", "NORTHERN", "NORTHEAST", "NORTHWEST", "SOUTHERN", "SOUTEAST", "SOUTHWEST", "CENTRAL", "EASTERN", "WESTERN"];
+const DISTRICTS = ["ALL", "NORTHERN", "NORTHEAST", "NORTHWEST", "SOUTHERN", "SOUTHEAST", "SOUTHWEST", "CENTRAL", "EASTERN", "WESTERN"];
 
 class Filter extends React.Component
 {
@@ -73,6 +73,8 @@ class Filter extends React.Component
 						<option value="all">All</option>
 						<option value="firearm">Firearm</option>
 						<option value="hands">Hands</option>
+						<option value="fire">Fire</option>
+						<option value="knife">Knife</option>
 						<option value="other">Other</option>
 					</select>
 				</Collapse>
@@ -100,18 +102,23 @@ class Filter extends React.Component
 			form: Object.assign(this.state.form, {[e.target.name]: e.target.value})
 		});
 
-		//Prepare the query parameters and URL
-		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(this.state.form).filter(
+		var filtersToUse = Object.keys(this.state.form).filter(
+			(param) => this.state.form[param] != "" && this.state.form[param].toLowerCase() != "all"
+		)
+
+		var filtersAndValues = {}
+
+		//Prepare the query parameters and URL"
+		var URL = Constants.API_URL + Constants.FILTER + "?" + filtersToUse.map(
 			(param) => {
-				return this.state.form[param] != "" && this.state.form[param].toLowerCase() != "all"
-			}
-			).map(
-			(param) => {
+				filtersAndValues[param] = this.state.form[param];
 				return param + "=" + this.state.form[param];
 			}).join("&");
 
+		console.log("Filters and Values: ", filtersAndValues)
+
 		//Indicate that a crime request is being made
-		this.props.crimeRequest();
+		this.props.crimeRequest(filtersAndValues);
 
 		//Submit the form data
 		fetch(
@@ -134,7 +141,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-	crimeRequest: () => dispatch(crimeRequest()),
+	crimeRequest: (filters={}) => dispatch(crimeRequest(filters)),
 	crimeResponse: (data) => dispatch(crimeResponse(data))
 })
 

@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import '../node_modules/font-awesome/css/font-awesome.min.css'; 
 
 import { Provider } from 'react-redux'
 import configureStore from './store';
 
 
 ReactDOM.render(
-<Provider store={configureStore({loading: false, crimes: []})}>
+<Provider store={configureStore({loading: false, crimes: [], filters: {}})}>
     <App />
 </Provider>, 
 document.getElementById('root'));

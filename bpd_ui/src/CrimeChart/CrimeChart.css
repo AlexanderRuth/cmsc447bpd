@@ -1,0 +1,14 @@
+.chart-detail {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: black;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.fullscreen-icon:hover {
+    cursor: pointer;
+    font-size: 20px;
+}

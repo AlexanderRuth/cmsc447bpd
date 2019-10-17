@@ -2,11 +2,13 @@ import * as Constants from '../constants/constants.js';
 
 //Call when data is being requested
 //So loading screens can be shown across components
-export const crimeRequest = () => {
+export const crimeRequest = (filters={}) => {
+    console.log("CRIME REQUEST: ", filters)
     return {
         type: Constants.CRIME_REQUEST,
         payload: {
-            loading: true
+            loading: true,
+            filters: filters
         }
     }
 }
