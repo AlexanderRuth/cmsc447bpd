@@ -17,9 +17,15 @@ import org.hibernate.annotations.ParamDef;
 @Entity
 @FilterDef(name="beforeDate", parameters=@ParamDef(name="beforeDate", type="date"))
 @FilterDef(name="afterDate", parameters=@ParamDef(name="afterDate", type="date"))
+@FilterDef(name="isWeapon", parameters=@ParamDef(name="weapon", type="string"))
+@FilterDef(name="isCrimeCode", parameters=@ParamDef(name="crimecode", type="string"))
+@FilterDef(name="isDistrict", parameters=@ParamDef(name="district", type="string"))
 @Filters( {
 	@Filter(name="beforeDate", condition=":beforeDate >= crimedate"),
-	@Filter(name="afterDate", condition=":afterDate <= crimedate")
+	@Filter(name="afterDate", condition=":afterDate <= crimedate"),
+	@Filter(name="isWeapon", condition=":weapon = weapon"),
+	@Filter(name="isCrimeCode", condition=":crimecode = crimecode"),
+	@Filter(name="isDistrict", condition=":district = district")
 })
 public class Crime {
 
