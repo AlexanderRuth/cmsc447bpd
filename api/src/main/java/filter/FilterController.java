@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,9 @@ public class FilterController {
 	@Autowired
 	private CrimeRepository crimeRepository;
 	
+	@Autowired
+	private FilterService fs;
+	
 	@RequestMapping(value = "/greeting")
 	public String all()
 	{
@@ -42,13 +46,6 @@ public class FilterController {
 	}
 	
 	
-	//Sample: /filterbydate?crimecode=4C&crimedate=2019-09-18
-    @CrossOrigin
-	@GetMapping(path="/filterbydate")
-    public @ResponseBody Iterable<Crime> filterByDate(@RequestParam(name = "crimecode") String crimecode, @RequestParam(name = "crimedate") @DateTimeFormat(pattern="yyyy-mm-dd") java.util.Date crimedate) {
-            return crimeRepository.findAllByCrimecodeAndCrimedate(crimecode, crimedate);
-    }
-    
     @CrossOrigin
 	@GetMapping(path="/filterbyall")
     public @ResponseBody Iterable<Crime> findByAllFilters(@RequestParam(name = "crimecode", required=false) String crimecode, 
@@ -57,32 +54,13 @@ public class FilterController {
     	@RequestParam(name = "weapon", required=false) String weapon,
     	@RequestParam(name = "district", required=false) String district) {
    
-    	//Apply before and after filters as needed
-    	if(before != null) {
-    		Filter filterBefore = (Filter)entityManager.unwrap(Session.class).enableFilter("beforeDate");
-    		filterBefore.setParameter("beforeDate", java.sql.Date.valueOf(before));
-    	}
-        
-    	if(after != null) {
-    		Filter filterAfter = (Filter)entityManager.unwrap(Session.class).enableFilter("afterDate");
-        	filterAfter.setParameter("afterDate", java.sql.Date.valueOf(after));
-    	}
+    	fs.apply_filters(crimecode, before, after, weapon, district);
         
     	Crime crime = new Crime();
-    	crime.setCrimecode(crimecode);
-    	crime.setWeapon(weapon);
-    	crime.setDistrict(district);
     
     	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime)); 	
     	
-    	//Remove before and after filters as needed
-    	if(before != null) {
-    		entityManager.unwrap(Session.class).disableFilter("beforeDate");
-    	}
-        
-    	if(after != null) {
-    		entityManager.unwrap(Session.class).disableFilter("afterDate");
-    	}
+    	fs.clear_filters(crimecode, before, after, weapon, district);
     	
     	return response;
     }
@@ -95,34 +73,10 @@ public class FilterController {
     	@RequestParam(name = "weapon", required=false) String weapon,
     	@RequestParam(name = "district", required=false) String district,
     	@RequestParam(name = "group_by", required = true) String group_by) {
+    	
+    	fs.apply_filters(crimecode, before, after, weapon, district);
    
     	List<Aggregation> response = null;
-    	
-    	//Apply filters as needed
-    	if(before != null) {
-    		Filter filterBefore = (Filter)entityManager.unwrap(Session.class).enableFilter("beforeDate");
-    		filterBefore.setParameter("beforeDate", java.sql.Date.valueOf(before));
-    	}
-        
-    	if(after != null) {
-    		Filter filterAfter = (Filter)entityManager.unwrap(Session.class).enableFilter("afterDate");
-        	filterAfter.setParameter("afterDate", java.sql.Date.valueOf(after));
-    	}
-    	
-    	if(weapon != null) {
-    		Filter filterWeapon = (Filter)entityManager.unwrap(Session.class).enableFilter("isWeapon");
-    		filterWeapon.setParameter("weapon", weapon); 		
-    	}
-    	
-    	if(crimecode != null) {
-    		Filter filterCrimecode = (Filter)entityManager.unwrap(Session.class).enableFilter("isCrimeCode");
-    		filterCrimecode.setParameter("crimecode", crimecode);
-    	}
-    	
-    	if(district != null) {
-    		Filter filterDistrict = (Filter)entityManager.unwrap(Session.class).enableFilter("isDistrict");
-    		filterDistrict.setParameter("district", district);
-    	}
     	
     	if(group_by.contentEquals("weapon"))
     		response = crimeRepository.countByWeapon();
@@ -130,27 +84,14 @@ public class FilterController {
     		response = crimeRepository.countByDistrict();
     	if(group_by.contentEquals("crimecode"))
 		    response = crimeRepository.countByCrimecode();
+    	if(group_by.contentEquals("day"))
+    		response = crimeRepository.countByDay();
+    	if(group_by.contentEquals("month"))
+    		response = crimeRepository.countByMonth();
+    	if(group_by.contentEquals("year"))
+    		response = crimeRepository.countByYear();
     	
-    	//Remove filters as needed
-    	if(before != null) {
-    		entityManager.unwrap(Session.class).disableFilter("beforeDate");
-    	}
-        
-    	if(after != null) {
-    		entityManager.unwrap(Session.class).disableFilter("afterDate");
-    	}
-    	
-    	if (weapon != null) {
-    		entityManager.unwrap(Session.class).disableFilter("isWeapon");
-    	}
-    	
-    	if (crimecode != null) {
-    		entityManager.unwrap(Session.class).disableFilter("isCrimecode");
-    	}
-    	
-    	if (district != null) {
-    		entityManager.unwrap(Session.class).disableFilter("isDistrict");
-    	}
+    	fs.clear_filters(crimecode, before, after, weapon, district);
     	
     	return response;
     }

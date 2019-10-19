@@ -31,8 +31,7 @@ import aggregation.Aggregation;
 
 @Repository
 public interface CrimeRepository extends CrudRepository<Crime, Integer> {
-        Iterable<Crime> findAllByCrimecode(String crimecode);
-        Iterable<Crime> findAllByCrimecodeAndCrimedate(String crimecode, java.util.Date date);
+	
         Iterable<Crime> findAll(Example<Crime> example);
  
         @Query("SELECT new aggregation.Aggregation(c.weapon, COUNT(c)) FROM Crime c GROUP BY c.weapon")
@@ -43,4 +42,13 @@ public interface CrimeRepository extends CrudRepository<Crime, Integer> {
         
         @Query("SELECT new aggregation.Aggregation(c.district, COUNT(c)) FROM Crime c GROUP BY c.district")
         List<Aggregation> countByDistrict();
+        
+        @Query("SELECT new aggregation.Aggregation(DAY(c.crimedate), MONTH(c.crimedate), YEAR(c.crimedate), COUNT(c)) FROM Crime c GROUP BY YEAR(c.crimedate), MONTH(c.crimedate), DAY(c.crimedate)")
+        List<Aggregation> countByDay();
+        
+        @Query("SELECT new aggregation.Aggregation(MONTH(c.crimedate), YEAR(c.crimedate), COUNT(c)) FROM Crime c GROUP BY YEAR(c.crimedate), MONTH(c.crimedate)")
+        List<Aggregation> countByMonth();
+        
+        @Query("SELECT new aggregation.Aggregation(YEAR(c.crimedate), COUNT(c)) FROM Crime c GROUP BY YEAR(c.crimedate)")
+        List<Aggregation> countByYear();
 }

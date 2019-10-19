@@ -9,6 +9,25 @@ public class Aggregation {
 		this.count = c;
 	}
 	
+	//Constructor for day, month, year
+	public Aggregation(int day, int month, int year, Long c) {
+		this.field = Integer.toString(month) + "/" + Integer.toString(day) + "/" + Integer.toString(year);
+		this.count = c;
+	}
+	
+	//Constructor for month, year
+	public Aggregation(int month, int year, Long c) {
+		this.field = Integer.toString(month) + "/" + Integer.toString(year);
+		this.count = c;
+	}
+	
+	//Constructor for year
+	public Aggregation(int year, Long c) {
+		this.field = Integer.toString(year);
+		this.count = c;
+	}
+	
+	
 	public String getField() {
 		return field;
 	}
