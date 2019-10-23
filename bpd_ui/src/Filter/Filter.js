@@ -97,7 +97,6 @@ class Filter extends React.Component
 	updateForm(e)
 	{
 		//Update the particular entry
-		//FOR TESTING: Add a crimedate
 		this.setState({
 			form: Object.assign(this.state.form, {[e.target.name]: e.target.value})
 		});
@@ -114,6 +113,15 @@ class Filter extends React.Component
 				filtersAndValues[param] = this.state.form[param];
 				return param + "=" + this.state.form[param];
 			}).join("&");
+
+		var bounds = ["southBoundary", "northBoundary", "eastBoundary", "westBoundary"]
+		if(this.props.filters && this.props.filters["southBoundary"])
+			URL += (filtersToUse.length > 0 ? "&" : "") + bounds.map(
+				(key) => {
+					filtersAndValues[key] = this.props.filters[key]
+					return key + "=" + this.props.filters[key]
+				}
+			).join("&")
 
 		console.log("Filters and Values: ", filtersAndValues)
 
@@ -137,9 +145,11 @@ class Filter extends React.Component
 	}
 }
 
-const mapStateToProps = state => ({
-})
-
+const mapStateToProps = (state) => {
+	return {
+		filters: state.crimeReducer.filters
+	}
+}
 const mapDispatchToProps = dispatch => ({
 	crimeRequest: (filters={}) => dispatch(crimeRequest(filters)),
 	crimeResponse: (data) => dispatch(crimeResponse(data))

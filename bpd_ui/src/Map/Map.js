@@ -8,14 +8,9 @@ import "./CrimeMarker.css";
 import * as Constants from '../constants/constants.js';
 import {connect} from 'react-redux';
 import memoize from "memoize-one";
+import fetch from 'isomorphic-fetch';
+import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 
-
-/*
-				heatmapLibrary={true}         
-				heatmap={JSON.parse(JSON.stringify(this.state.heatmap))
-"AIzaSyCHwvB9HjPI1_K9jR0B3ly3mmPswvXXWJc"
-*/
-	
 class CrimeMap extends React.Component
 {	
 	static defaultProps = {
@@ -36,14 +31,17 @@ class CrimeMap extends React.Component
 	{
 		super()
 		this.state = {
-			heatmap: null,
-			show: null,
-			googlemap: null,
-			googlemaps: null
+			show: null,					//Show a hovered over marker
+			map: null,					//Reference to the google map
+			google: null,				//Google library
+			showDrawSettings: false,	//Display rectangle draw options
+			boxMoved: false,			//Was the box moved since the last submit?
 		}
 
 		this.createMarkers = this.createMarkers.bind(this);
 		this.handleApiLoaded = this.handleApiLoaded.bind(this);
+		this.showOrHideBox = this.showOrHideBox.bind(this);
+		this.submitBoundingBox = this.submitBoundingBox.bind(this);
 	}
 	
 	render()
@@ -68,14 +66,16 @@ class CrimeMap extends React.Component
 			</GoogleMapReact>
 
 			{/*GOOGLE MAP CONTROL OPTIONS*/}
-			<div ref={(el) => this._drawIcon = el} className="draw-icon" style={{display: "none"}} onClick={() => {this.setState({showDrawSettings: !this.state.showDrawSettings});}}>
+			<div ref={(el) => this._drawIcon = el} className="draw-icon" onClick={() => {this.setState({showDrawSettings: !this.state.showDrawSettings});}}>
 				<i className="fa fa-pencil" style={{fontSize: "20px"}}/>
 			</div>
 
-			
+	
 			<div ref={(el) => this._drawSettings = el} className="draw-settings" style={{display: this.state.showDrawSettings ? "" : "none"}}>
-				<button onClick={() => {this.state.rectangle.setMap(null)}}>Hide Box</button>
-				<button onClick={() => {this.state.rectangle.setMap(this.state.map)}}>Show Box</button>
+				Bounding Box:<br/>
+				<button onClick={() => {this.showOrHideBox()}}> {this.state.showBox ? "Hide" : "Show"}</button>
+				{this.state.boxSelection ? <button onClick={() => {this.submitBoundingBox(null)}}>Clear Selection</button> : null}
+				{this.state.boxMoved && this.state.showBox ? <div><br/><button onClick={() => this.submitBoundingBox(this.state.bounds)}>Submit Selection</button></div> : null}
 			</div>
 
 
@@ -132,8 +132,7 @@ class CrimeMap extends React.Component
 				lng: parseFloat(parseFloat(data[i]["longitude"]))
 			})
 		}
-		
-		console.log(heatmapData);
+
 		this.heatmapData = heatmapData;
 		return heatmapData;
 	}
@@ -142,20 +141,21 @@ class CrimeMap extends React.Component
 	{
 		const map = google.map
 
-		console.log("GOOGLE: ", google);
+		//Save the google library and the google map
 		this.setState({
-			googlemap: google,
+			google: google,
 			map: map
 		})
 
+		//Default rectangle coordinates
 		var rectCoords = [
 			new google.maps.LatLng(39.1000, -76.6122),
 			new google.maps.LatLng(39.2000, -76.6122),
 			new google.maps.LatLng(39.1000, -76.6000),
 			new google.maps.LatLng(39.2000, -76.6000)
-		  ];
+		];
 
-		  // Styling & Controls
+		// Styling & Controls
 		var myRectangle= new google.maps.Rectangle({
 			paths: rectCoords,
 			draggable: true,
@@ -171,29 +171,86 @@ class CrimeMap extends React.Component
 				east: -76.6000,
 				west: -76.7000,
 			},
-		  });
+		});
 		
-		myRectangle.setMap(map)
-
+		//Keep track of the newly created rectangle
 		this.setState({
 			rectangle: myRectangle
 		})
 
+		//Store the rectangle bounds as a state when rectangle changes bounds
 		myRectangle.addListener('bounds_changed', (e) => {
 			var bounds = this.state.rectangle.getBounds();
 			this.setState({
-				ne: [bounds.getNorthEast().lat(), bounds.getNorthEast().lng()],
-				sw: [bounds.getSouthWest().lat(), bounds.getSouthWest().lng()]
+				bounds: {
+					northBoundary: bounds.getNorthEast().lat(),
+					eastBoundary: bounds.getNorthEast().lng(),
+					southBoundary: bounds.getSouthWest().lat(),
+					westBoundary: bounds.getSouthWest().lng()
+				},
+				boxMoved: true
 			});
 		})
 
+		//Add custom google map controls (Draw Button, Draw Settings, Submit Button)
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this._drawIcon);
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this._drawSettings);
+	}
 
+	showOrHideBox()
+	{
+		if(this.state.showBox)
+		{
+			this.state.rectangle.setMap(null);
+			this.setState({showBox: false});
+		}
+		else
+		{
+			this.state.rectangle.setMap(this.state.map);
+			this.setState({showBox: true});
+		}
+	}
+
+	submitBoundingBox(bounds)
+	{
+		var filtersToUse = this.props.filters;
+
+		if(!bounds){
+			delete filtersToUse["northBoundary"];
+			delete filtersToUse["southBoundary"];
+			delete filtersToUse["westBoundary"];
+			delete filtersToUse["eastBoundary"];
+		}
 		
-		this._drawIcon.style.display = "";
+		filtersToUse = Object.assign({}, filtersToUse, bounds);
 
-		console.log("STATE: ", this.state);
+		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(filtersToUse).map(
+			(param) => {
+				return param + "=" + filtersToUse[param];
+			}).join("&");
+
+		//Indicate that a crime request is being made
+		this.props.crimeRequest(filtersToUse);
+
+		//Submit the form data
+		fetch(
+			URL,
+			{
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+			}
+		).then(
+			(response) => response.json()
+		).then(
+			//Store the response
+			(response) => {this.props.crimeResponse(response)}
+		)
+
+		if(bounds)
+			this.setState({boxSelection: true});
+		else
+			this.setState({boxSelection: false})
 	}
 	
 }
@@ -201,8 +258,15 @@ class CrimeMap extends React.Component
 const mapStateToProps = (state) => {
 	return {
 		data: state.crimeReducer.crimes,
-		loading: state.crimeReducer.loading
+		loading: state.crimeReducer.loading,
+		filters: state.crimeReducer.filters
 	}
 }
 
-export default connect(mapStateToProps)(CrimeMap);
+const mapDispatchToProps = dispatch => ({
+	crimeRequest: (filters={}) => dispatch(crimeRequest(filters)),
+	crimeResponse: (data) => dispatch(crimeResponse(data))
+})
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(CrimeMap);
