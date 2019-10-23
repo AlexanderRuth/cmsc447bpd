@@ -33,6 +33,7 @@ import aggregation.Aggregation;
 @Repository
 public interface CrimeRepository extends CrudRepository<Crime, Integer> {
 	
+		Iterable<Crime> findAll(Example<Crime> example);
         Iterable<Crime> findAll(Example<Crime> example, Pageable pageRequest);
  
         @Query("SELECT new aggregation.Aggregation(c.weapon, COUNT(c)) FROM Crime c GROUP BY c.weapon")

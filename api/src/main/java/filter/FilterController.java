@@ -64,9 +64,8 @@ public class FilterController {
     	fs.apply_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
         
     	Crime crime = new Crime();
-    	Pageable page = null;
     
-    	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime), page); 	
+    	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime)); 	
     	
     	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
     	
