@@ -7,6 +7,8 @@ import test_data from '../test_data/crimes.json';
 import "./CrimeMarker.css";
 import * as Constants from '../constants/constants.js';
 import {connect} from 'react-redux';
+import memoize from "memoize-one";
+
 
 /*
 				heatmapLibrary={true}         
@@ -23,6 +25,12 @@ class CrimeMap extends React.Component
 		},
 		zoom: 11
 	};
+
+	//Memoization allows for the component to rerender without having to recompute
+	//createHeatmap if this.props.data did not change :)
+	heatmap = memoize(
+		(data) => {return this.createHeatmap(data)}
+	)
 	
 	constructor()
 	{
@@ -33,17 +41,15 @@ class CrimeMap extends React.Component
 			googlemap: null,
 			googlemaps: null
 		}
-		
-		console.log(this.state.heatmap)
 
 		this.createMarkers = this.createMarkers.bind(this);
 		this.handleApiLoaded = this.handleApiLoaded.bind(this);
 	}
-
 	
 	render()
 	{
 		return(
+
 		<div style={{height: "100%", width: "100%", filter: this.props.loading ? "blur(1px)" : ""}}>
 			<div style={{color: "black", position: 'absolute', top: 0, right: 0, zIndex: 2}}>
 				{this.state.show ? JSON.stringify(this.props.data[this.state.show]) : ""}
@@ -51,17 +57,34 @@ class CrimeMap extends React.Component
 			<GoogleMapReact
 				ref={(el) => this._googleMap = el}
 				yesIWantToUseGoogleMapApiInternals
-				bootstrapURLKeys={{key: Constants.API_KEY}}
+				bootstrapURLKeys={{key: Constants.API_KEY, libraries: ['drawing'].join(',')}}
 				defaultCenter={this.props.center}
 				defaultZoom={this.props.zoom}
 				options={{scrollwheel: true, zoomControl: true}}
 				heatmapLibrary={true}         
-				heatmap={this.createHeatmap(this.props.data)}
-				onGoogleApiLoaded={(map, maps) => this.handleApiLoaded(map, maps)}
+				heatmap={this.heatmap(this.props.data)}
+				onGoogleApiLoaded={(google) => this.handleApiLoaded(google)}
 			>
 			</GoogleMapReact>
-		
-		{/*<img src={bmore_map} style={{width: "70%", height: "550px", overflow: "hidden", float: "left"}}/>*/}
+
+			{/*GOOGLE MAP CONTROL OPTIONS*/}
+			<div ref={(el) => this._drawIcon = el} className="draw-icon" style={{display: "none"}} onClick={() => {this.setState({showDrawSettings: !this.state.showDrawSettings});}}>
+				<i className="fa fa-pencil" style={{fontSize: "20px"}}/>
+			</div>
+
+			
+			<div ref={(el) => this._drawSettings = el} className="draw-settings" style={{display: this.state.showDrawSettings ? "" : "none"}}>
+				<button onClick={() => {this.state.rectangle.setMap(null)}}>Hide Box</button>
+				<button onClick={() => {this.state.rectangle.setMap(this.state.map)}}>Show Box</button>
+			</div>
+
+
+			{this.state.ne ? 
+			<div style={{backgroundColor: "black", position: "absolute", top: 0, left: 0, padding: 10, color: "white"}}>
+				{"Lat: " + this.state.ne[0] + " Long: " + this.state.ne[1]}
+			</div>
+			: null}
+
 		</div>
 		);
 	}
@@ -111,16 +134,64 @@ class CrimeMap extends React.Component
 		}
 		
 		console.log(heatmapData);
+		this.heatmapData = heatmapData;
 		return heatmapData;
 	}
 
-	handleApiLoaded(map, maps)
+	handleApiLoaded(google)
 	{
-		console.log(map, maps);
+		const map = google.map
+
+		console.log("GOOGLE: ", google);
 		this.setState({
-			googlemap: map.map,
-			googlemaps: map.maps
+			googlemap: google,
+			map: map
 		})
+
+		var rectCoords = [
+			new google.maps.LatLng(39.1000, -76.6122),
+			new google.maps.LatLng(39.2000, -76.6122),
+			new google.maps.LatLng(39.1000, -76.6000),
+			new google.maps.LatLng(39.2000, -76.6000)
+		  ];
+
+		  // Styling & Controls
+		var myRectangle= new google.maps.Rectangle({
+			paths: rectCoords,
+			draggable: true,
+			editable: true,
+			strokeColor: '#000000',
+			strokeOpacity: 0.8,
+			strokeWeight: 2,
+			fillColor: '#F0F000',
+			fillOpacity: 0.35,
+			bounds: {
+				north: 39.2904,
+				south: 39.2000,
+				east: -76.6000,
+				west: -76.7000,
+			},
+		  });
+		
+		myRectangle.setMap(map)
+
+		this.setState({
+			rectangle: myRectangle
+		})
+
+		myRectangle.addListener('bounds_changed', (e) => {
+			var bounds = this.state.rectangle.getBounds();
+			this.setState({
+				ne: [bounds.getNorthEast().lat(), bounds.getNorthEast().lng()],
+				sw: [bounds.getSouthWest().lat(), bounds.getSouthWest().lng()]
+			});
+		})
+
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this._drawIcon);
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this._drawSettings);
+
+		
+		this._drawIcon.style.display = "";
 
 		console.log("STATE: ", this.state);
 	}

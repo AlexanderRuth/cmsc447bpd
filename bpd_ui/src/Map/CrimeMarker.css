@@ -10,3 +10,34 @@
 .crime-marker:hover{
 	background-color: blue
 }
+
+.draw-icon {
+	text-align: center;
+	vertical-align: bottom;
+	line-height: 40px; 
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.19);
+	width: 40px;
+	height: 40px;
+	border-radius: 2px;
+	background-color: gold;
+	color: #4F4F4F;
+	margin-top: 5px;
+	margin-right: 10px;
+}
+
+.draw-settings {
+	background-color: gold;
+	width: 150px;
+	margin-right: 10px;
+	margin-top: 5px;
+	height: 30px;
+	padding: 5px;
+	border-radius: 2px;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.19);
+}	
+
+
+.draw-icon:hover {
+	color: black;
+	cursor: pointer;
+}

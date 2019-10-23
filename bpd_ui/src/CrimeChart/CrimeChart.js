@@ -100,6 +100,7 @@ class CrimeChart extends React.Component
 					<option>District</option>
 					<option>Weapon</option>
 					<option>Crimecode</option>
+					<option>Month</option>
 				</select>
 			</div>
 
@@ -263,8 +264,17 @@ class CrimeChart extends React.Component
 
 	  onMouseOverRadial(datapoint, event)
 	  {
+		  var y;
+		  var sum = 0;
+
+		  for(var i in this.state.chartData){
+			sum += this.state.chartData[i].y;
+			if (this.state.chartData[i].x == datapoint.label)
+				y = this.state.chartData[i].y
+		  }
+
 		  this.setState({
-			  detailDisplay: {x: datapoint.label, y: datapoint.angle}
+			  detailDisplay: {x: datapoint.label, y: y + " (" + (y/sum * 100).toFixed(2) + "%)"}
 		  })
 	  }
 

@@ -22,7 +22,7 @@ class CrimeTable extends React.Component
 	render()
 	{
 		return(
-		<div>
+		<div style={{backgroundColor: "#DADADA"}}>
 			{this.props.loading ? <div className="loader"/> : null}
 			<div style={{width: "100%", filter: this.props.loading ? "blur(5px)" : ""}}>
 				<ReactTable

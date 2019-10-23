@@ -1,6 +1,9 @@
 package filter;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +60,34 @@ public class FilterController {
     	fs.apply_filters(crimecode, before, after, weapon, district);
         
     	Crime crime = new Crime();
+    	Pageable page = null;
     
-    	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime)); 	
+    	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime), page); 	
+    	
+    	fs.clear_filters(crimecode, before, after, weapon, district);
+    	
+    	return response;
+    }
+    
+    @CrossOrigin
+	@GetMapping(path="/filterbyallpaged")
+    public @ResponseBody Iterable<Crime> findByAllFiltersPaged(@RequestParam(name = "crimecode", required=false) String crimecode, 
+    	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
+    	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
+    	@RequestParam(name = "weapon", required=false) String weapon,
+    	@RequestParam(name = "district", required=false) String district,
+    	@RequestParam(name = "page_number", required=false) Integer page_number, @RequestParam(name="page_size", required=false) Integer page_size) {
+   
+    	fs.apply_filters(crimecode, before, after, weapon, district);
+        
+    	Crime crime = new Crime();
+    	
+    	page_number = page_number != null ? page_number : 0;
+    	page_size = page_size != null ? page_size : 5;
+    	
+    	Pageable page = PageRequest.of(page_number, page_size, Sort.by("post"));
+    
+    	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime), page); 	
     	
     	fs.clear_filters(crimecode, before, after, weapon, district);
     	

@@ -3,6 +3,7 @@ package crime;
 import java.util.List;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -32,7 +33,7 @@ import aggregation.Aggregation;
 @Repository
 public interface CrimeRepository extends CrudRepository<Crime, Integer> {
 	
-        Iterable<Crime> findAll(Example<Crime> example);
+        Iterable<Crime> findAll(Example<Crime> example, Pageable pageRequest);
  
         @Query("SELECT new aggregation.Aggregation(c.weapon, COUNT(c)) FROM Crime c GROUP BY c.weapon")
         List<Aggregation> countByWeapon();
