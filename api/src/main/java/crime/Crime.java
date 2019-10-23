@@ -20,12 +20,20 @@ import org.hibernate.annotations.ParamDef;
 @FilterDef(name="isWeapon", parameters=@ParamDef(name="weapon", type="string"))
 @FilterDef(name="isCrimeCode", parameters=@ParamDef(name="crimecode", type="string"))
 @FilterDef(name="isDistrict", parameters=@ParamDef(name="district", type="string"))
+@FilterDef(name="northOfLatitude", parameters=@ParamDef(name="southBoundary", type="double"))
+@FilterDef(name="southOfLatitude", parameters=@ParamDef(name="northBoundary", type="double"))
+@FilterDef(name="westOfLongitude", parameters=@ParamDef(name="eastBoundary", type="double"))
+@FilterDef(name="eastOfLongitude", parameters=@ParamDef(name="westBoundary", type="double"))
 @Filters( {
 	@Filter(name="beforeDate", condition=":beforeDate >= crimedate"),
 	@Filter(name="afterDate", condition=":afterDate <= crimedate"),
 	@Filter(name="isWeapon", condition=":weapon = weapon"),
 	@Filter(name="isCrimeCode", condition=":crimecode = crimecode"),
-	@Filter(name="isDistrict", condition=":district = district")
+	@Filter(name="isDistrict", condition=":district = district"),
+	@Filter(name="northOfLatitude", condition=":southBoundary <= latitude"),
+	@Filter(name="southOfLatitude", condition=":northBoundary >= latitude"),
+	@Filter(name="westOfLongitude", condition=":eastBoundary >= longitude"),
+	@Filter(name="eastOfLongitude", condition=":westBoundary <= longitude")
 })
 public class Crime {
 

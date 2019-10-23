@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -55,16 +54,21 @@ public class FilterController {
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
     	@RequestParam(name = "weapon", required=false) String weapon,
-    	@RequestParam(name = "district", required=false) String district) {
+    	@RequestParam(name = "district", required=false) String district,
+    	@RequestParam(name = "northBoundary", required=false) Double northBoundary,
+    	@RequestParam(name = "westBoundary", required=false) Double westBoundary,
+    	@RequestParam(name = "southBoundary", required=false) Double southBoundary,
+    	@RequestParam(name = "eastBoundary", required=false) Double eastBoundary) 
+    	{
    
-    	fs.apply_filters(crimecode, before, after, weapon, district);
+    	fs.apply_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
         
     	Crime crime = new Crime();
     	Pageable page = null;
     
     	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime), page); 	
     	
-    	fs.clear_filters(crimecode, before, after, weapon, district);
+    	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
     	
     	return response;
     }
@@ -76,9 +80,13 @@ public class FilterController {
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
     	@RequestParam(name = "weapon", required=false) String weapon,
     	@RequestParam(name = "district", required=false) String district,
+    	@RequestParam(name = "northBoundary", required=false) Double northBoundary,
+    	@RequestParam(name = "westBoundary", required=false) Double westBoundary,
+    	@RequestParam(name = "southBoundary", required=false) Double southBoundary,
+    	@RequestParam(name = "eastBoundary", required=false) Double eastBoundary, 
     	@RequestParam(name = "page_number", required=false) Integer page_number, @RequestParam(name="page_size", required=false) Integer page_size) {
    
-    	fs.apply_filters(crimecode, before, after, weapon, district);
+    	fs.apply_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
         
     	Crime crime = new Crime();
     	
@@ -89,7 +97,7 @@ public class FilterController {
     
     	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime), page); 	
     	
-    	fs.clear_filters(crimecode, before, after, weapon, district);
+    	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
     	
     	return response;
     }
@@ -101,9 +109,13 @@ public class FilterController {
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
     	@RequestParam(name = "weapon", required=false) String weapon,
     	@RequestParam(name = "district", required=false) String district,
+    	@RequestParam(name = "northBoundary", required=false) Double northBoundary,
+    	@RequestParam(name = "westBoundary", required=false) Double westBoundary,
+    	@RequestParam(name = "southBoundary", required=false) Double southBoundary,
+    	@RequestParam(name = "eastBoundary", required=false) Double eastBoundary, 
     	@RequestParam(name = "group_by", required = true) String group_by) {
     	
-    	fs.apply_filters(crimecode, before, after, weapon, district);
+    	fs.apply_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
    
     	List<Aggregation> response = null;
     	
@@ -120,7 +132,7 @@ public class FilterController {
     	if(group_by.contentEquals("year"))
     		response = crimeRepository.countByYear();
     	
-    	fs.clear_filters(crimecode, before, after, weapon, district);
+    	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
     	
     	return response;
     }
