@@ -17,6 +17,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +50,7 @@ public class FilterController {
 	
 	
     @CrossOrigin
-	@GetMapping(path="/filterbyall")
+	@PostMapping(path="/filterbyall")
     public @ResponseBody Iterable<Crime> findByAllFilters(@RequestParam(name = "crimecode", required=false) String crimecode, 
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
@@ -73,7 +74,7 @@ public class FilterController {
     }
     
     @CrossOrigin
-	@GetMapping(path="/filterbyallpaged")
+	@PostMapping(path="/filterbyallpaged")
     public @ResponseBody Iterable<Crime> findByAllFiltersPaged(@RequestParam(name = "crimecode", required=false) String crimecode, 
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
@@ -102,7 +103,7 @@ public class FilterController {
     }
 
     @CrossOrigin
-	@GetMapping(path="/count")
+	@PostMapping(path="/count")
     public @ResponseBody List<Aggregation> count(@RequestParam(name = "crimecode", required=false) String crimecode, 
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
