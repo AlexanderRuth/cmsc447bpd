@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.Polygon;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -53,4 +54,25 @@ public interface CrimeRepository extends CrudRepository<Crime, Integer> {
         
         @Query("SELECT new aggregation.Aggregation(YEAR(c.crimedate), COUNT(c)) FROM Crime c GROUP BY YEAR(c.crimedate)")
         List<Aggregation> countByYear();
+        
+        /*  Crime Schema:
+        
+     	private java.sql.Date crimedate;
+        private java.sql.Time crimetime;
+        private String crimecode;
+        private String location;
+        private String description;
+        private String inside_outside;
+        private String weapon;
+        private Integer post;
+       private String district;
+        private String neighborhood;
+        private Double longitude;
+        private Double latitude;
+        private String premise;
+        private Integer total_incidents;
+     */
+        @Query("SELECT new crime.Crime(c.id, c.crimedate, c.crimetime, c.crimecode, c.location, c.description, c.inside_outside, c.weapon, c.post, c.district, c.neighborhood, c.longitude, c.latitude, c.premise, c.total_incidents)"
+        		+ " FROM Crime c WHERE true = ST_CONTAINS(ST_GeomFromText(?1), Point(c.longitude, c.latitude))")
+        List<Crime> withinPolygon(String polygon);
 }

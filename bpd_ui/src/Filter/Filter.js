@@ -14,6 +14,9 @@ import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 */
 
 const DISTRICTS = ["ALL", "NORTHERN", "NORTHEAST", "NORTHWEST", "SOUTHERN", "SOUTHEAST", "SOUTHWEST", "CENTRAL", "EASTERN", "WESTERN"];
+const DEFAULT_FILTERS = {
+	after: "2019-09-10"
+}
 
 class Filter extends React.Component
 {
@@ -27,7 +30,7 @@ class Filter extends React.Component
 			show: false,
 			form: {
 				before: "",
-				after: "",
+				after: DEFAULT_FILTERS.after,
 				before_time: "",
 				after_time: "",
 				district: "All",
@@ -38,6 +41,38 @@ class Filter extends React.Component
 
 		this.updateForm = this.updateForm.bind(this);
 	}
+
+	componentDidMount()
+	{
+		var filtersAndValues = {}
+
+		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(DEFAULT_FILTERS).map(
+			(param) => {
+				filtersAndValues[param] = DEFAULT_FILTERS[param];
+				return param + "=" + DEFAULT_FILTERS[param];
+		}).join("&");
+
+		console.log("FILTERS AND VALUES: ", filtersAndValues);
+
+		//Indicate that a crime request is being made
+		this.props.crimeRequest(filtersAndValues);
+
+		//Submit the form data
+		fetch(
+			URL,
+			{
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+			}
+		).then(
+			(response) => response.json()
+		).then(
+			//Store the response
+			(response) => {this.props.crimeResponse(response)}
+		)
+	}
+
 	render()
 	{
 		return(
@@ -53,7 +88,7 @@ class Filter extends React.Component
 				<Collapse title="Time">
 						Committed After: 
 						<br/>
-						<input onBlur={this.updateForm} name="after" type="date"/> 
+						<input defaultValue={DEFAULT_FILTERS.after} onBlur={this.updateForm} name="after" type="date"/> 
 						<input onBlur={this.updateForm} name="after_time" type="time"/> EST
 						<br/>
 						Committed Before: 
@@ -107,14 +142,16 @@ class Filter extends React.Component
 
 		var filtersAndValues = {}
 
-		//Prepare the query parameters and URL"
+		//Prepare the query parameters and URL
 		var URL = Constants.API_URL + Constants.FILTER + "?" + filtersToUse.map(
 			(param) => {
 				filtersAndValues[param] = this.state.form[param];
 				return param + "=" + this.state.form[param];
 			}).join("&");
 
+		//Handle lat long boundaries, if they exist
 		var bounds = ["southBoundary", "northBoundary", "eastBoundary", "westBoundary"]
+		
 		if(this.props.filters && this.props.filters["southBoundary"])
 			URL += (filtersToUse.length > 0 ? "&" : "") + bounds.map(
 				(key) => {

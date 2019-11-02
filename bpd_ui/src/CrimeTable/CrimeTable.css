@@ -6,11 +6,11 @@ table{
 }
 td {
 	border: 1px solid black;
+	height: 100%;
 }
 
 tr {
 	border: 1px solid black;
-	font-size: 10px;
 }
 
 th {

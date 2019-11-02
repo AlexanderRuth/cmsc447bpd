@@ -28,7 +28,9 @@ class CrimeTable extends React.Component
 				<ReactTable
 					data={this.dataToRow(this.props.data)}
 					columns={this.dataToColumn()} 
-					defaultPageSize={5}/>
+					defaultPageSize={5}
+					getTdProps={(state, rowInfo, column, instance) => {return {style: {height: "5vh"}}}}
+					getTfootTrProps={() => {return {style: {height: "0vh"}}}}/>
 			</div>
 		</div>
 		);
@@ -58,8 +60,7 @@ class CrimeTable extends React.Component
 				return {
 					Header: key,
 					accessor: key.toLowerCase(),
-					sort: 'asc',
-					width: 100
+					sort: 'asc'
 				}
 			}
 		);

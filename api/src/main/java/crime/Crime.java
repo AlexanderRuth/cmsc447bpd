@@ -37,7 +37,32 @@ import org.hibernate.annotations.ParamDef;
 })
 public class Crime {
 
-    @Id
+	public Crime()
+	{
+		return;
+	}
+	
+    public Crime(Integer id, LocalDate crimedate, LocalTime crimetime, String crimecode, String location,
+			String description, String inside_outside, String weapon, Integer post, String district,
+			String neighborhood, Double longitude, Double latitude, String premise, Integer total_incidents) {
+		super();
+		this.id = id;
+		this.crimedate = crimedate;
+		this.crimetime = crimetime;
+		this.crimecode = crimecode;
+		this.location = location;
+		this.description = description;
+		this.inside_outside = inside_outside;
+		this.weapon = weapon;
+		this.post = post;
+		this.district = district;
+		this.neighborhood = neighborhood;
+		this.longitude = longitude;
+		this.latitude = latitude;
+		this.premise = premise;
+		this.total_incidents = total_incidents;
+	}
+	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
 

@@ -4,7 +4,9 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.geo.Point;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -27,8 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import crime.Crime;
 import crime.CrimeRepository;
-
+import latlong.LatLong;
+import latlong.LatLongWrapper;
 import aggregation.Aggregation;
+import org.springframework.data.geo.Polygon;
 
 @RestController
 public class FilterController {
@@ -50,7 +54,7 @@ public class FilterController {
 	
 	
     @CrossOrigin
-	@PostMapping(path="/filterbyall")
+	@GetMapping(path="/filterbyall")
     public @ResponseBody Iterable<Crime> findByAllFilters(@RequestParam(name = "crimecode", required=false) String crimecode, 
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
@@ -74,7 +78,7 @@ public class FilterController {
     }
     
     @CrossOrigin
-	@PostMapping(path="/filterbyallpaged")
+	@GetMapping(path="/filterbyallpaged")
     public @ResponseBody Iterable<Crime> findByAllFiltersPaged(@RequestParam(name = "crimecode", required=false) String crimecode, 
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
@@ -103,7 +107,7 @@ public class FilterController {
     }
 
     @CrossOrigin
-	@PostMapping(path="/count")
+	@GetMapping(path="/count")
     public @ResponseBody List<Aggregation> count(@RequestParam(name = "crimecode", required=false) String crimecode, 
     	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
     	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
@@ -133,6 +137,46 @@ public class FilterController {
     		response = crimeRepository.countByYear();
     	
     	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
+    	
+    	return response;
+    }
+    
+    @CrossOrigin
+	@PostMapping(path="/polygon")
+    public @ResponseBody List<Crime> getPolygon(@RequestBody LatLongWrapper polygon_wrapper) {
+    	
+    	fs.apply_filters(polygon_wrapper.getCrimecode(), polygon_wrapper.getBefore(), polygon_wrapper.getAfter(), polygon_wrapper.getWeapon(), polygon_wrapper.getDistrict(), null, null, null, null);
+   
+   
+    	List<LatLong> polygon = polygon_wrapper.getPoints();
+    	ArrayList<Point> points = new ArrayList<Point>();
+    	
+    	for(int i = 0; i < polygon.toArray().length; i++)
+    	{
+    		System.err.println(polygon.get(i).getLat());
+    		points.add(new Point(polygon.get(i).getLng(), polygon.get(i).getLat()));
+    	}
+    	
+    	Polygon poly = new Polygon(points);
+    	String poly_string = "POLYGON((";
+    	Boolean first = true;
+    	
+    	for(Point point : poly.getPoints())
+    	{
+    		poly_string += String.valueOf(point.getX()) + " " + String.valueOf(point.getY()) + ", ";
+    	}
+    	
+    	poly_string += String.valueOf(poly.getPoints().get(0).getX()) + " " + String.valueOf(poly.getPoints().get(0).getY());
+    	
+    	poly_string += "))";
+    	
+    	System.err.println(poly_string);
+    	
+    	//String test = "POLYGON((-71.1776585052917 42.3902909739571,-71.1776820268866 42.3903701743239, -71.1776063012595 42.3903825660754,-71.1775826583081 42.3903033653531,-71.1776585052917 42.3902909739571))";
+
+    	List<Crime> response = crimeRepository.withinPolygon(poly_string);
+    	
+    	fs.clear_filters(polygon_wrapper.getCrimecode(), polygon_wrapper.getBefore(), polygon_wrapper.getAfter(), polygon_wrapper.getWeapon(), polygon_wrapper.getDistrict(), null, null, null, null);
     	
     	return response;
     }
