@@ -46,11 +46,12 @@ class Filter extends React.Component
 	{
 		var filtersAndValues = {}
 
-		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(DEFAULT_FILTERS).map(
+		var URL = Constants.API_URL + Constants.FILTER;
+		
+		Object.keys(DEFAULT_FILTERS).map(
 			(param) => {
 				filtersAndValues[param] = DEFAULT_FILTERS[param];
-				return param + "=" + DEFAULT_FILTERS[param];
-		}).join("&");
+		})
 
 		console.log("FILTERS AND VALUES: ", filtersAndValues);
 
@@ -61,9 +62,11 @@ class Filter extends React.Component
 		fetch(
 			URL,
 			{
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/json'
 				},
+				body: JSON.stringify(filtersAndValues)
 			}
 		).then(
 			(response) => response.json()
@@ -143,22 +146,17 @@ class Filter extends React.Component
 		var filtersAndValues = {}
 
 		//Prepare the query parameters and URL
-		var URL = Constants.API_URL + Constants.FILTER + "?" + filtersToUse.map(
+		var URL = Constants.API_URL + Constants.FILTER; 
+
+		filtersToUse.map(
 			(param) => {
 				filtersAndValues[param] = this.state.form[param];
-				return param + "=" + this.state.form[param];
-			}).join("&");
+		})
 
-		//Handle lat long boundaries, if they exist
-		var bounds = ["southBoundary", "northBoundary", "eastBoundary", "westBoundary"]
-		
-		if(this.props.filters && this.props.filters["southBoundary"])
-			URL += (filtersToUse.length > 0 ? "&" : "") + bounds.map(
-				(key) => {
-					filtersAndValues[key] = this.props.filters[key]
-					return key + "=" + this.props.filters[key]
-				}
-			).join("&")
+		console.log("THIS.PROPS.FILTERS: ", this.props.filters)
+
+		if(this.props.filters.points)
+			filtersAndValues = Object.assign({}, filtersAndValues, {"points": this.props.filters.points});
 
 		console.log("Filters and Values: ", filtersAndValues)
 
@@ -169,9 +167,11 @@ class Filter extends React.Component
 		fetch(
 			URL,
 			{
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/json'
 				},
+				body: JSON.stringify(filtersAndValues)
 			}
 		).then(
 			(response) => response.json()

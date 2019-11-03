@@ -45,13 +45,14 @@ class CrimeMap extends React.Component
 		this.submitBoundingBox = this.submitBoundingBox.bind(this);
 		this.callIfResized = this.callIfResized.bind(this);
 		this.onMouseMove = this.onMouseMove.bind(this);
+		this.showHidePolygon = this.showHidePolygon.bind(this);
 	}
 	
 	render()
 	{
 		return(
 
-		<div style={{height: "100%", width: "100%", filter: this.props.loading ? "blur(1px)" : ""}}>
+		<div style={{cursor: this.state.canDraw ? "crosshair" : "", height: "100%", width: "100%", filter: this.props.loading ? "blur(1px)" : ""}}>
 			<div style={{color: "black", position: 'absolute', top: 0, right: 0, zIndex: 2}}>
 				{this.state.show ? JSON.stringify(this.props.data[this.state.show]) : ""}
 			</div>
@@ -75,10 +76,12 @@ class CrimeMap extends React.Component
 
 	
 			<div ref={(el) => this._drawSettings = el} className="draw-settings" style={{display: this.state.showDrawSettings ? "" : "none"}}>
-				Bounding Box:<br/>
-				<button onClick={() => {this.showOrHideBox()}}> {this.state.showBox ? "Hide" : "Show"}</button>
-				{this.state.boxSelection ? <button onClick={() => {this.submitBoundingBox(null)}}>Clear Selection</button> : null}
-				<button onClick={()=>{this.setState({canDraw: this.state.canDraw ? false :true})}}>Freeform</button>
+				Drawing:<br/>
+				
+				{this.state.showBox || this.state.drawSelection ? <button onClick={() => {this.showHidePolygon()}}>Hide/Show</button>: null}
+				{this.state.canDraw || this.state.drawSelection ? null : <button onClick={() => {this.showOrHideBox()}}>Box</button>}
+				{this.state.boxSelection || this.state.drawSelection ? <button onClick={() => {this.state.drawSelection ? this.clearDrawSelection() : this.submitBoundingBox(null)}}>Clear Selection</button> : null}
+				{this.state.drawSelection || this.state.boxSelection || (this.state.rectangle && this.state.rectangle.map) ? null : <button onClick={()=>{this.state.map.setOptions({draggableCursor: this.state.canDraw ? "default" : "crosshair"}); this.setState({canDraw: this.state.canDraw ? false : true})}}>Freeform</button>}
 				{/*this.state.boxMoved && this.state.showBox ? <div><br/><button onClick={() => this.submitBoundingBox(this.state.bounds)}>Submit Selection</button></div> : null*/}
 			</div>
 
@@ -159,8 +162,8 @@ class CrimeMap extends React.Component
 			new google.maps.LatLng(39.2000, -76.6000)
 		];
 
-		google.maps.event.addListener(map, 'mousedown', () => {this.setState({drawing: true})})
-		google.maps.event.addListener(map, 'mouseup', () => {this.finishPolyline(); this.setState({drawing: false})})
+		google.maps.event.addListener(map, 'mousedown', () => {if(this.state.canDraw) this.setState({drawing: true})})
+		google.maps.event.addListener(map, 'mouseup', () => {this.finishPolyline(); this.setState({drawing: false, canDraw: false})})
 		google.maps.event.addListener(map, 'mousemove', this.onMouseMove);
 
 		// Styling & Controls
@@ -218,6 +221,14 @@ class CrimeMap extends React.Component
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this._drawSettings);
 	}
 
+	showHidePolygon()
+	{
+		if(this.state.drawSelection)
+			this._mapDrawingPolygon.setMap(this._mapDrawingPolygon.map ? null : this.state.map)
+		else
+			this.state.rectangle.setMap(this.state.rectangle.map ? null : this.state.map);
+	}
+
 	showOrHideBox()
 	{
 		if(this.state.showBox)
@@ -237,18 +248,21 @@ class CrimeMap extends React.Component
 		var filtersToUse = this.props.filters;
 
 		if(!bounds){
-			delete filtersToUse["northBoundary"];
-			delete filtersToUse["southBoundary"];
-			delete filtersToUse["westBoundary"];
-			delete filtersToUse["eastBoundary"];
+			delete filtersToUse["points"]
+		}
+		else{
+			bounds = [ 
+						{lat: bounds.northBoundary, lng: bounds.eastBoundary}, 
+						{lat: bounds.southBoundary, lng: bounds.eastBoundary},
+						{lat: bounds.southBoundary, lng: bounds.westBoundary},
+						{lat: bounds.northBoundary, lng: bounds.westBoundary}
+					]
+			bounds = {points: bounds}
 		}
 		
 		filtersToUse = Object.assign({}, filtersToUse, bounds);
 
-		var URL = Constants.API_URL + Constants.FILTER + "?" + Object.keys(filtersToUse).map(
-			(param) => {
-				return param + "=" + filtersToUse[param];
-			}).join("&");
+		var URL = Constants.API_URL + Constants.FILTER;
 
 		//Indicate that a crime request is being made
 		this.props.crimeRequest(filtersToUse);
@@ -257,9 +271,11 @@ class CrimeMap extends React.Component
 		fetch(
 			URL,
 			{
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/json'
 				},
+				body: JSON.stringify(filtersToUse)
 			}
 		).then(
 			(response) => response.json()
@@ -287,7 +303,7 @@ class CrimeMap extends React.Component
 
 	onMouseMove(event)
 	{
-		if(!this.state.drawing)
+		if(!this.state.drawing || !this.state.canDraw)
 			return;
 
 		if(!this._mapDrawing)
@@ -312,36 +328,18 @@ class CrimeMap extends React.Component
 		}
 	}
 
-	finishPolyline()
+	clearDrawSelection()
 	{
-		this._mapDrawing.setMap(null);
+		if(!this._mapDrawingPolygon)
+			return
 
-		this._mapDrawingPolygon = new this.state.google.maps.Polygon({
-			path: this._mapDrawing.getPath(),
-			geodesic: true,
-			strokeColor: "#FF0000",
-			strokeOpacity: 1.0,
-			strokeWeight: 2,
-			draggable: true,
-			fillColor: '#F0F000',
-			fillOpacity: 0.35,
-		})
-
-		this._mapDrawingPolygon.setMap(this.state.map);
-
-		//Prepare filters
 		var filters = this.props.filters;
-		filters["points"] = [];
-
-		for(var point = 0; point < this._mapDrawing.getPath().getLength(); point++)
-		{
-			filters["points"].push({lat: this._mapDrawing.getPath().getAt(point).lat(), lng: this._mapDrawing.getPath().getAt(point).lng()});
-		}
+		delete filters["points"];
 
 		//Indicate that a crime request is being made
 		this.props.crimeRequest(filters);
 
-		var URL = Constants.API_URL + "/polygon";
+		var URL = Constants.API_URL + Constants.FILTER;
 
 		//Submit the form data
 		fetch(
@@ -360,6 +358,65 @@ class CrimeMap extends React.Component
 			(response) => {this.props.crimeResponse(response)}
 		)
 
+		this._mapDrawingPolygon.setMap(null);
+		this.setState({drawSelection: false, drawing: false});
+		this._mapDrawingPolygon = null;
+		this._mapDrawing = null;
+	}
+
+	finishPolyline()
+	{
+		if(!this._mapDrawing || !this.state.drawing)
+			return;
+			
+		this._mapDrawing.setMap(null);
+
+		this._mapDrawingPolygon = new this.state.google.maps.Polygon({
+			path: this._mapDrawing.getPath(),
+			geodesic: true,
+			strokeColor: "#FF0000",
+			strokeOpacity: 1.0,
+			strokeWeight: 2,
+			draggable: false,
+			fillColor: '#F0F000',
+			fillOpacity: 0.35,
+		})
+
+		this._mapDrawingPolygon.setMap(this.state.map);
+
+		//Prepare filters
+		var filters = this.props.filters;
+		filters["points"] = [];
+
+		for(var point = 0; point < this._mapDrawing.getPath().getLength(); point++)
+		{
+			filters["points"].push({lat: this._mapDrawing.getPath().getAt(point).lat(), lng: this._mapDrawing.getPath().getAt(point).lng()});
+		}
+
+		//Indicate that a crime request is being made
+		this.props.crimeRequest(filters);
+
+		var URL = Constants.API_URL + Constants.FILTER;
+
+		//Submit the form data
+		fetch(
+			URL,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(filters)
+			}
+		).then(
+			(response) => response.json()
+		).then(
+			//Store the response
+			(response) => {this.props.crimeResponse(response)}
+		)
+
+		this.setState({drawSelection: true, drawing: false});
+		this.state.map.setOptions({draggableCursor: ""});
 
 	}
 	

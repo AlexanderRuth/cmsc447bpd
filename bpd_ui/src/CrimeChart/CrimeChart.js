@@ -276,19 +276,18 @@ class CrimeChart extends React.Component
 		var filtersToUse = this.props.filters;
 		filtersToUse["group_by"] = groupBy.toLowerCase();
 
-		var URL = Constants.API_URL + Constants.AGGREGATE + "?" + Object.keys(filtersToUse).map(
-			(param) => {
-				return param + "=" + filtersToUse[param];
-			}).join("&");
+		var URL = Constants.API_URL + Constants.AGGREGATE;
 
 			
 		//Submit the form data
 		fetch(
 			URL,
 			{
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/json'
 				},
+				body: JSON.stringify(filtersToUse)
 			}
 		).then(
 			(response) => response.json()
