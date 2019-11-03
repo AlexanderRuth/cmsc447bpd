@@ -54,129 +54,89 @@ public class FilterController {
 	
 	
     @CrossOrigin
-	@GetMapping(path="/filterbyall")
-    public @ResponseBody Iterable<Crime> findByAllFilters(@RequestParam(name = "crimecode", required=false) String crimecode, 
-    	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
-    	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
-    	@RequestParam(name = "weapon", required=false) String weapon,
-    	@RequestParam(name = "district", required=false) String district,
-    	@RequestParam(name = "northBoundary", required=false) Double northBoundary,
-    	@RequestParam(name = "westBoundary", required=false) Double westBoundary,
-    	@RequestParam(name = "southBoundary", required=false) Double southBoundary,
-    	@RequestParam(name = "eastBoundary", required=false) Double eastBoundary) 
+	@PostMapping(path="/filterbyall")
+    public @ResponseBody Iterable<Crime> findByAllFilters(@RequestBody CrimeFilter filter)
     	{
    
-    	fs.apply_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
+    	fs.apply_filters(filter);
         
     	Crime crime = new Crime();
-    
-    	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime)); 	
+
+    	Iterable<Crime> response;
     	
-    	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
+    	if(filter.points != null)
+    		response = fs.points_within_polygon(filter);
+    	else
+    		response = crimeRepository.findAll(Example.of(crime)); 
+    	
+    	fs.clear_filters(filter);
     	
     	return response;
     }
     
     @CrossOrigin
-	@GetMapping(path="/filterbyallpaged")
-    public @ResponseBody Iterable<Crime> findByAllFiltersPaged(@RequestParam(name = "crimecode", required=false) String crimecode, 
-    	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
-    	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
-    	@RequestParam(name = "weapon", required=false) String weapon,
-    	@RequestParam(name = "district", required=false) String district,
-    	@RequestParam(name = "northBoundary", required=false) Double northBoundary,
-    	@RequestParam(name = "westBoundary", required=false) Double westBoundary,
-    	@RequestParam(name = "southBoundary", required=false) Double southBoundary,
-    	@RequestParam(name = "eastBoundary", required=false) Double eastBoundary, 
-    	@RequestParam(name = "page_number", required=false) Integer page_number, @RequestParam(name="page_size", required=false) Integer page_size) {
+	@PostMapping(path="/filterbyallpaged")
+    public @ResponseBody Iterable<Crime> findByAllFiltersPaged(@RequestBody CrimeFilter filter) {
    
-    	fs.apply_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
+    	fs.apply_filters(filter);
         
     	Crime crime = new Crime();
     	
-    	page_number = page_number != null ? page_number : 0;
-    	page_size = page_size != null ? page_size : 5;
+    	filter.page_number = filter.page_number != null ? filter.page_number : 0;
+    	filter.page_size = filter.page_size != null ? filter.page_size : 5;
     	
-    	Pageable page = PageRequest.of(page_number, page_size, Sort.by("post"));
-    
-    	Iterable<Crime> response = crimeRepository.findAll(Example.of(crime), page); 	
+    	Pageable page = PageRequest.of(filter.page_number, filter.page_size, Sort.by("post"));
     	
-    	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
+    	Iterable<Crime> response;
+    	
+    	if(filter.points != null)
+    		response = fs.points_within_polygon(filter);
+    	else
+    		response = crimeRepository.findAll(Example.of(crime), page); 	
+   
+    	
+    	fs.clear_filters(filter);
     	
     	return response;
     }
 
     @CrossOrigin
-	@GetMapping(path="/count")
-    public @ResponseBody List<Aggregation> count(@RequestParam(name = "crimecode", required=false) String crimecode, 
-    	@RequestParam(name = "before", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate before, 
-    	@RequestParam(name = "after", required=false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate after, 
-    	@RequestParam(name = "weapon", required=false) String weapon,
-    	@RequestParam(name = "district", required=false) String district,
-    	@RequestParam(name = "northBoundary", required=false) Double northBoundary,
-    	@RequestParam(name = "westBoundary", required=false) Double westBoundary,
-    	@RequestParam(name = "southBoundary", required=false) Double southBoundary,
-    	@RequestParam(name = "eastBoundary", required=false) Double eastBoundary, 
-    	@RequestParam(name = "group_by", required = true) String group_by) {
+	@PostMapping(path="/count")
+    public @ResponseBody List<Aggregation> count(@RequestBody CrimeFilter filter) {
     	
-    	fs.apply_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
+    	fs.apply_filters(filter);
    
     	List<Aggregation> response = null;
+    	String group_by = filter.group_by != null ? filter.group_by : "weapon";
+    	String poly_string = filter.points != null ? fs.polygon_string(filter) : null;
     	
     	if(group_by.contentEquals("weapon"))
-    		response = crimeRepository.countByWeapon();
+    		response = poly_string != null ? crimeRepository.countByWeapon(poly_string) : crimeRepository.countByWeapon();
     	if(group_by.contentEquals("district"))
-    		response = crimeRepository.countByDistrict();
+    		response = poly_string != null ? crimeRepository.countByDistrict(poly_string) : crimeRepository.countByDistrict();
     	if(group_by.contentEquals("crimecode"))
-		    response = crimeRepository.countByCrimecode();
+    		response = poly_string != null ? crimeRepository.countByCrimecode(poly_string) : crimeRepository.countByCrimecode();
     	if(group_by.contentEquals("day"))
-    		response = crimeRepository.countByDay();
+    		response = poly_string != null ? crimeRepository.countByDay(poly_string) : crimeRepository.countByDay();
     	if(group_by.contentEquals("month"))
-    		response = crimeRepository.countByMonth();
+    		response = poly_string != null ? crimeRepository.countByMonth(poly_string) : crimeRepository.countByMonth();
     	if(group_by.contentEquals("year"))
-    		response = crimeRepository.countByYear();
+    		response = poly_string != null ? crimeRepository.countByYear(poly_string) : crimeRepository.countByYear();
     	
-    	fs.clear_filters(crimecode, before, after, weapon, district, northBoundary, westBoundary, southBoundary, eastBoundary);
+    	fs.clear_filters(filter);
     	
     	return response;
     }
     
     @CrossOrigin
 	@PostMapping(path="/polygon")
-    public @ResponseBody List<Crime> getPolygon(@RequestBody LatLongWrapper polygon_wrapper) {
+    public @ResponseBody List<Crime> getPolygon(@RequestBody CrimeFilter filter) {
     	
-    	fs.apply_filters(polygon_wrapper.getCrimecode(), polygon_wrapper.getBefore(), polygon_wrapper.getAfter(), polygon_wrapper.getWeapon(), polygon_wrapper.getDistrict(), null, null, null, null);
-   
-   
-    	List<LatLong> polygon = polygon_wrapper.getPoints();
-    	ArrayList<Point> points = new ArrayList<Point>();
+    	fs.apply_filters(filter);
+  
+    	List<Crime> response = fs.points_within_polygon(filter);
     	
-    	for(int i = 0; i < polygon.toArray().length; i++)
-    	{
-    		System.err.println(polygon.get(i).getLat());
-    		points.add(new Point(polygon.get(i).getLng(), polygon.get(i).getLat()));
-    	}
-    	
-    	Polygon poly = new Polygon(points);
-    	String poly_string = "POLYGON((";
-    	Boolean first = true;
-    	
-    	for(Point point : poly.getPoints())
-    	{
-    		poly_string += String.valueOf(point.getX()) + " " + String.valueOf(point.getY()) + ", ";
-    	}
-    	
-    	poly_string += String.valueOf(poly.getPoints().get(0).getX()) + " " + String.valueOf(poly.getPoints().get(0).getY());
-    	
-    	poly_string += "))";
-    	
-    	System.err.println(poly_string);
-    	
-    	//String test = "POLYGON((-71.1776585052917 42.3902909739571,-71.1776820268866 42.3903701743239, -71.1776063012595 42.3903825660754,-71.1775826583081 42.3903033653531,-71.1776585052917 42.3902909739571))";
-
-    	List<Crime> response = crimeRepository.withinPolygon(poly_string);
-    	
-    	fs.clear_filters(polygon_wrapper.getCrimecode(), polygon_wrapper.getBefore(), polygon_wrapper.getAfter(), polygon_wrapper.getWeapon(), polygon_wrapper.getDistrict(), null, null, null, null);
+    	fs.clear_filters(filter);
     	
     	return response;
     }

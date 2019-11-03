@@ -29,11 +29,7 @@ import org.hibernate.annotations.ParamDef;
 	@Filter(name="afterDate", condition=":afterDate <= crimedate"),
 	@Filter(name="isWeapon", condition=":weapon = weapon"),
 	@Filter(name="isCrimeCode", condition=":crimecode = crimecode"),
-	@Filter(name="isDistrict", condition=":district = district"),
-	@Filter(name="northOfLatitude", condition=":southBoundary <= latitude"),
-	@Filter(name="southOfLatitude", condition=":northBoundary >= latitude"),
-	@Filter(name="westOfLongitude", condition=":eastBoundary >= longitude"),
-	@Filter(name="eastOfLongitude", condition=":westBoundary <= longitude")
+	@Filter(name="isDistrict", condition=":district = district")
 })
 public class Crime {
 
