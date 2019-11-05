@@ -6,6 +6,8 @@ import {MDBDataTable} from 'mdbreact';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import { connect } from 'react-redux';
+import {crimeRequest, crimeResponse} from '../actions/crimeRequest.js';
+import * as Constants from '../constants/constants.js';
 
 const headers = ["crimedate", "crimetime", "crimecode", "location", "description", "inside_outside", "weapon", "post", "district", "neighborhood", "longitude", "latitude", "premise", "total_incidents"]
 const PAGE_COUNT = 10;
@@ -14,21 +16,42 @@ const PAGE_COUNT = 10;
 
 class CrimeTable extends React.Component
 {	
-	constructor()
+	constructor(props)
 	{
-		super();
+		super(props);
+
+		this.state = {
+			curPage: -1,
+			loading: false
+		}
+
+		this.onPageChange = this.onPageChange.bind(this);
+	}
+
+	//Update the rendered data
+	componentDidUpdate(prevProps)
+	{
+		//If stopped loading and was loading, reload the data
+		if(!this.props.loading && prevProps.loading)
+		{
+			this.onPageChange(0);
+		}
 	}
 	
 	render()
 	{
 		return(
 		<div style={{backgroundColor: "#DADADA"}}>
-			{this.props.loading ? <div className="loader"/> : null}
-			<div style={{width: "100%", filter: this.props.loading ? "blur(5px)" : ""}}>
+			{this.props.loading || this.state.loading ? <div className="loader"/> : null}
+			<div style={{width: "100%", filter: this.props.loading || this.state.loading ? "blur(5px)" : ""}}>
 				<ReactTable
-					data={this.dataToRow(this.props.data)}
+					data={this.state.data ? this.dataToRow(this.state.data) : this.dataToRow(this.props.data)}
 					columns={this.dataToColumn()} 
 					defaultPageSize={5}
+					page={this.state.curPage}
+					pages={this.props.numPages ? this.props.numPages : -1}
+					manual
+					onPageChange={this.onPageChange}
 					getTdProps={(state, rowInfo, column, instance) => {return {style: {height: "5vh"}}}}
 					getTfootTrProps={() => {return {style: {height: "0vh"}}}}/>
 			</div>
@@ -65,12 +88,39 @@ class CrimeTable extends React.Component
 			}
 		);
 	}
+
+	onPageChange(pageIndex)
+	{
+		var filters = this.props.filters;
+		filters["page_number"] = pageIndex;
+		filters["page_size"] = 5;
+		
+		console.log("GOING");
+		var URL = Constants.API_URL + Constants.FILTER;
+		this.setState({loading: true});
+
+		fetch(URL,
+			{
+				method: 'POST',
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(this.props.filters)
+			}
+		).then(
+			(response) => response.json()
+		).then(
+			(json) => {this.setState({data: json.content, curPage: pageIndex, loading: false})}
+		)
+	}
 }
 
 const mapStateToProps = (state) => {
 	return {
 		data: state.crimeReducer.crimes,
-		loading: state.crimeReducer.loading
+		loading: state.crimeReducer.loading,
+		numPages: state.crimeReducer.numPages,
+		filters: state.crimeReducer.filters
 	}
 }
 

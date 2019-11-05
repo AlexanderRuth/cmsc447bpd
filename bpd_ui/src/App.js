@@ -11,6 +11,7 @@ import { createBrowserHistory } from "history";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Slider from './Slider/Slider.js';
 
 
 const history = createBrowserHistory();
@@ -21,10 +22,13 @@ function App() {
 		<Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
 		<Router>
 			<Row fluid style={{height: "13vh", margin: 0}}>
-				<Col style={{padding: 0}} md={3}>
+				<Col style={{padding: 0}} md={2}>
 					<Header />
 				</Col>
-				<Col style={{padding: 0}} md={9}>
+				<Col style={{padding: 0}} md={7}>
+					<Slider />
+				</Col>
+				<Col style={{padding: 0}} md={3}>
 					<Filter/>
 				</Col>
 			</Row>

@@ -11,10 +11,6 @@
 	text-decoration: none;
 }
 
-/*Clickable header items*/
-.header-item.clickable {
-	
-}
 
 .header-item.clickable:hover {
 	background-color: grey;

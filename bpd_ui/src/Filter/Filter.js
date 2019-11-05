@@ -72,7 +72,7 @@ class Filter extends React.Component
 			(response) => response.json()
 		).then(
 			//Store the response
-			(response) => {this.props.crimeResponse(response)}
+			(response) => {this.props.crimeResponse(response.content, response.totalPages)}
 		)
 	}
 
@@ -85,7 +85,7 @@ class Filter extends React.Component
 				<div className="filter-button" onClick={() => {this.setState({show: !this.state.show})}}>
 					Filters
 				</div>
-				<div style={{display: this.state.show ? "" : "none", position: "absolute", top: "13vh", zIndex: 2, right: 0, width: "30%"}}>
+				<div style={{display: this.state.show ? "" : "none", position: "absolute", top: "13vh", zIndex: 2, right: 0, width: "100%"}}>
 				
 				<form style={{textAlign: "left"}}>
 				<Collapse title="Time">
@@ -177,7 +177,7 @@ class Filter extends React.Component
 			(response) => response.json()
 		).then(
 			//Store the response
-			(response) => {this.props.crimeResponse(response)}
+			(response) => {this.props.crimeResponse(response.content, response.totalPages)}
 		)
 	}
 }
@@ -189,7 +189,7 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = dispatch => ({
 	crimeRequest: (filters={}) => dispatch(crimeRequest(filters)),
-	crimeResponse: (data) => dispatch(crimeResponse(data))
+	crimeResponse: (data, numPages) => dispatch(crimeResponse(data, numPages))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Filter);

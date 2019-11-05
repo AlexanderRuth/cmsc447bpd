@@ -1,0 +1,49 @@
+.slidercontainer{
+    background-color: black;
+}
+
+.slider{
+    appearance: none;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 0px;
+    pointer-events: none;
+    z-index: 0;
+    background: none;
+    border: 1px solid white;
+    outline: none;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    top: 50px;
+}
+
+.slider::-webkit-slider-thumb{
+    appearance: none;
+    z-index: 10;
+    pointer-events: all;
+    width: 25px;
+    height: 25px;
+    background: gold;
+    cursor: pointer;
+    border: none;
+    outline: 0;
+    position: relative;
+    border: 1px solid black;
+}
+
+.slider-middle{
+    background: repeating-linear-gradient(
+        45deg,
+        #606dbc,
+        #606dbc 10px,
+        #465298 10px,
+        #465298 20px
+      );
+
+    top: 50%;
+    height: 25px;
+    z-index: 0;
+    position: absolute;
+}

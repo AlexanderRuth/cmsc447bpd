@@ -14,12 +14,13 @@ export const crimeRequest = (filters={}) => {
 }
 
 //Call once the API data is returned
-export const crimeResponse = (data) => {
+export const crimeResponse = (data, numPages) => {
     return {
         type: Constants.CRIME_RESPONSE,
         payload: {
             loading: false,
-            crimes: data
+            crimes: data,
+            numPages: numPages
         }
     }
 }
