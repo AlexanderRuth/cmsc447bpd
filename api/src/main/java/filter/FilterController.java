@@ -101,6 +101,27 @@ public class FilterController {
     }
 
     @CrossOrigin
+    @PostMapping(path="/latlong")
+    public @ResponseBody List<LatLong> latlong(@RequestBody CrimeFilter filter) {
+   
+    	fs.apply_filters(filter);
+
+    	Crime crime = new Crime();
+    	String poly_string = filter.points != null ? fs.polygon_string(filter) : null;
+
+    	List<LatLong> response = null;
+    	
+    	if(filter.points != null)
+    		response = crimeRepository.FindAll(poly_string);
+    	else
+    		response = crimeRepository.FindAll(Example.of(crime));
+    	
+    	fs.clear_filters(filter);
+    	
+    	return response;
+    }
+    
+    @CrossOrigin
 	@PostMapping(path="/count")
     public @ResponseBody List<Aggregation> count(@RequestBody CrimeFilter filter) {
     	

@@ -11,6 +11,7 @@ import org.springframework.data.repository.RepositoryDefinition;
 import org.springframework.stereotype.Repository;
 
 import crime.Crime;
+import latlong.LatLong;
 import aggregation.Aggregation;
 
 /*  Crime Schema:
@@ -23,7 +24,7 @@ import aggregation.Aggregation;
     private String inside_outside;
     private String weapon;
     private Integer post;
-   private String district;
+    private String district;
     private String neighborhood;
     private Double longitude;
     private Double latitude;
@@ -37,6 +38,12 @@ public interface CrimeRepository extends CrudRepository<Crime, Integer> {
 		Iterable<Crime> findAll(Example<Crime> example);
         Iterable<Crime> findAll(Example<Crime> example, Pageable pageRequest);
  
+        @Query("SELECT new latlong.LatLong(c.latitude, c.longitude) FROM Crime c")
+        List<LatLong> FindAll(Example<Crime> example);
+        @Query("SELECT new latlong.LatLong(c.latitude, c.longitude) FROM Crime c "
+        		+ "WHERE true = ST_CONTAINS(ST_GeomFromText(?1), Point(c.longitude, c.latitude))")        
+        List<LatLong> FindAll(String polygon);
+        
         @Query("SELECT new aggregation.Aggregation(c.weapon, COUNT(c)) FROM Crime c "
         		+ "GROUP BY c.weapon")
         List<Aggregation> countByWeapon();
