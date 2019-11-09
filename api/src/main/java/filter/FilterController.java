@@ -35,6 +35,7 @@ import aggregation.Aggregation;
 import org.springframework.data.geo.Polygon;
 
 @RestController
+@RequestMapping("/crime")
 public class FilterController {
 
 	@PersistenceContext 
@@ -46,7 +47,7 @@ public class FilterController {
 	@Autowired
 	private FilterService fs;
 	
-	@RequestMapping(value = "/greeting")
+	@GetMapping(value = "/greeting")
 	public String all()
 	{
 		return "Hi";
