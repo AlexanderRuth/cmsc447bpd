@@ -36,7 +36,8 @@ class CrimeMap extends React.Component
 			google: null,				//Google library
 			showDrawSettings: false,	//Display rectangle draw options
 			boxMoved: false,			//Was the box moved since the last submit?
-			drawing: false				//Drawing freeform?
+			drawing: false,				//Drawing freeform?
+			data: []
 		}
 
 		this.createMarkers = this.createMarkers.bind(this);
@@ -46,6 +47,35 @@ class CrimeMap extends React.Component
 		this.callIfResized = this.callIfResized.bind(this);
 		this.onMouseMove = this.onMouseMove.bind(this);
 		this.showHidePolygon = this.showHidePolygon.bind(this);
+	}
+	componentDidUpdate(prevProps)
+	{
+		if(!this._googleMap)
+			return;
+
+		if(this.props.loading || !prevProps.loading)
+			return;
+
+		var URL = Constants.API_URL + Constants.LATLONG;
+
+		var filters = this.props.filters;
+
+		//Submit the form data
+		fetch(
+			URL,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(filters)
+			}
+		).then(
+			(response) => response.json()
+		).then(
+			//Store the response
+			(response) => {this.setState({data: response}); this.props.crimeResponse(response)}
+		)
 	}
 	
 	render()
@@ -64,7 +94,7 @@ class CrimeMap extends React.Component
 				defaultZoom={this.props.zoom}
 				options={{scrollwheel: true, zoomControl: true, gestureHandling: (this.state.canDraw ? "none" : "all")}}
 				heatmapLibrary={true}         
-				heatmap={this.heatmap(this.props.data)}
+				heatmap={this.heatmap(this.state.data)}
 				onGoogleApiLoaded={(google) => this.handleApiLoaded(google)}
 			>
 			</GoogleMapReact>
@@ -99,15 +129,15 @@ class CrimeMap extends React.Component
 	createMarkers()
 	{
 		var markers = [];
-		let mark = this.props.data || [];
-		
+		let mark = this.state.data || [];
+
 		for(var i = 0; i < mark.length; i++)
 		{
-			if(mark[i]["latitude"] && mark[i]["longitude"])
+			if(mark[i]["lat"] && mark[i]["lng"])
 				markers.push(
 					<div className="crime-marker"
-						lat={mark[i]["latitude"]}
-						lng={mark[i]["longitude"]}
+						lat={mark[i]["lat"]}
+						lng={mark[i]["lng"]}
 						onMouseOver={(e) => {this.setState({show: e.target.id})}}
 						onMouseOff={()=>{this.setState({show: null})}}
 						id={i}>
@@ -120,23 +150,23 @@ class CrimeMap extends React.Component
 
 	createHeatmap(data)
 	{
-		console.log("CREATING HEATMAP")
+		console.log("CREATING HEATMAP: ", data)
 		if(!data)
 			return {positions: []}
 		
 		var heatmapData = {
 			positions: [],
 			options: {
-				radius: 50,
-				opacity: 1
+				opacity: .8,
+				weight: 50
 			}
 		}
 		
 		for(var i = 0; i < data.length; i++)
 		{
 			heatmapData.positions.push({
-				lat: parseFloat(parseFloat(data[i]["latitude"])),
-				lng: parseFloat(parseFloat(data[i]["longitude"]))
+				lat: parseFloat(parseFloat(data[i]["lat"])),
+				lng: parseFloat(parseFloat(data[i]["lng"]))
 			})
 		}
 
@@ -339,7 +369,7 @@ class CrimeMap extends React.Component
 		//Indicate that a crime request is being made
 		this.props.crimeRequest(filters);
 
-		var URL = Constants.API_URL + Constants.FILTER;
+		var URL = Constants.API_URL + Constants.LATLONG;
 
 		//Submit the form data
 		fetch(
@@ -355,7 +385,7 @@ class CrimeMap extends React.Component
 			(response) => response.json()
 		).then(
 			//Store the response
-			(response) => {this.props.crimeResponse(response)}
+			(response) => {this.setState({data: response}); this.props.crimeResponse(response)}
 		)
 
 		this._mapDrawingPolygon.setMap(null);
@@ -396,7 +426,7 @@ class CrimeMap extends React.Component
 		//Indicate that a crime request is being made
 		this.props.crimeRequest(filters);
 
-		var URL = Constants.API_URL + Constants.FILTER;
+		var URL = Constants.API_URL + Constants.LATLONG;
 
 		//Submit the form data
 		fetch(
@@ -412,7 +442,7 @@ class CrimeMap extends React.Component
 			(response) => response.json()
 		).then(
 			//Store the response
-			(response) => {this.props.crimeResponse(response)}
+			(response) => {this.setState({data: response}); this.props.crimeResponse(response)}
 		)
 
 		this.setState({drawSelection: true, drawing: false});
@@ -424,7 +454,6 @@ class CrimeMap extends React.Component
 
 const mapStateToProps = (state) => {
 	return {
-		data: state.crimeReducer.crimes,
 		loading: state.crimeReducer.loading,
 		filters: state.crimeReducer.filters
 	}

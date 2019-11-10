@@ -69,7 +69,6 @@ class CrimeChart extends React.Component
 	//Render the visualizations
 	render()
 	{
-		console.log("Props: ", this.props)
 		//If crime data is empty
 		if(!this.props.aggregate || !this.props.aggregate.length)
 		{
@@ -81,7 +80,7 @@ class CrimeChart extends React.Component
 		{
 			console.log("RERENDERING")
 			return(
-				<div style={{width: "100%", height: "100%"}}>
+				<div style={{width: "100%", overflowX: "scroll", height: "100%"}}>
 					{this.getXYPlot(this.state.fullscreen)}
 					{this.state.detailDisplay ? <div className="chart-detail">{this.state.detailDisplay.x + ": " + this.state.detailDisplay.y}</div> : null}
 				</div>
@@ -132,12 +131,9 @@ class CrimeChart extends React.Component
 
 		for(var i in data)
 			if(data[i].field != "NA" && data[i].field != "UNKNOWN")
-				chartData.push({x: data[i].field, y: data[i].count})
+				chartData.push({x: data[i].field, y: data[i].count, color: "#3366CC"})
 
 		chartData.sort((a,b) => {return a.y > b.y ? -1 : 1})
-		console.log("CHART DATA: ", chartData
-		)
-
 		return chartData;
 	}
 
@@ -220,7 +216,7 @@ class CrimeChart extends React.Component
 			case "line":
 				return (<LineSeries  onSeriesMouseOut={this.onMouseOut} onNearestX={this.onMouseOver} data={this.state.chartData} stroke="rgb(57,106,177)"/>)
 			case "bar":
-				return (<VerticalBarSeries onValueMouseOut={this.onMouseOut} onValueMouseOver={this.onMouseOver} style={{strokeWidth: 0}} data={this.state.chartData} fill="#42A5F5"/>)
+				return (<VerticalBarSeries colorType="literal" onValueMouseOut={this.onMouseOut} onValueMouseOver={this.onMouseOver} style={{strokeWidth: 0}} data={this.state.chartData}/>)
 			case "radial":
 				return (
 					<div style={{backgroundColor: "#FFFFFF", width: "100%", height: "100%"}}>

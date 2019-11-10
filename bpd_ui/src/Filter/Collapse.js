@@ -21,12 +21,15 @@ export default class Collapse extends React.Component
 			show: false,
 		}
 	}
+
 	render()
 	{
 		return(
 			<div className="collapsable">
-				<div onClick={(e) => {this.setState({show: !this.state.show})}} className="collapse-header">{this.props.title}</div>
-				<div className="collapse-body" style={{display: this.state.show ? "block": "block"}}>
+				<div onClick={(e) => {this.setState({show: !this.state.show})}} className="collapse-header">
+					{this.props.title}
+				</div>
+				<div className="collapse-body" style={{display: this.state.show ? "block": "none"}}>
 					{this.props.children}
 				</div>
 			</div>
