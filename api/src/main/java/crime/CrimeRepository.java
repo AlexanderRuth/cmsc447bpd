@@ -93,6 +93,8 @@ public interface CrimeRepository extends CrudRepository<Crime, Integer> {
         		+ "GROUP BY YEAR(c.crimedate)")
         List<Aggregation> countByYear(String polygon);
         
+        Crime findFirstByOrderByCrimedateDesc();
+        
         @Query("SELECT new crime.Crime(c.id, c.crimedate, c.crimetime, c.crimecode, c.location, c.description, c.inside_outside, c.weapon, c.post, c.district, c.neighborhood, c.longitude, c.latitude, c.premise, c.total_incidents)"
         		+ " FROM Crime c WHERE true = ST_CONTAINS(ST_GeomFromText(?1), Point(c.longitude, c.latitude))")
         List<Crime> withinPolygon(String polygon);

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Point;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import aggregation.Aggregation;
 import org.springframework.data.geo.Polygon;
 
 @RestController
+@RequestMapping("/crime")
 public class FilterController {
 
 	@PersistenceContext 
@@ -46,7 +48,7 @@ public class FilterController {
 	@Autowired
 	private FilterService fs;
 	
-	@RequestMapping(value = "/greeting")
+	@GetMapping(value = "/greeting")
 	public String all()
 	{
 		return "Hi";
@@ -146,6 +148,18 @@ public class FilterController {
     	
     	fs.clear_filters(filter);
     	
+    	return response;
+    }
+    
+    @CrossOrigin
+    @PostMapping(path="/latestdate")
+    public LocalDate getLatestDate(){
+    	
+    	LocalDate response = null;
+    	
+    	Crime crime = crimeRepository.findFirstByOrderByCrimedateDesc();
+    	
+    	response = crime.getCrimedate();
     	return response;
     }
     
