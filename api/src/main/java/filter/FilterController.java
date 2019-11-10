@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Point;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,6 +148,18 @@ public class FilterController {
     	
     	fs.clear_filters(filter);
     	
+    	return response;
+    }
+    
+    @CrossOrigin
+    @PostMapping(path="/latestdate")
+    public LocalDate getLatestDate(){
+    	
+    	LocalDate response = null;
+    	
+    	Crime crime = crimeRepository.findFirstByOrderByCrimedateDesc();
+    	
+    	response = crime.getCrimedate();
     	return response;
     }
     
