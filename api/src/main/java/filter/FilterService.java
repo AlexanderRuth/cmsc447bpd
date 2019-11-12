@@ -1,6 +1,7 @@
 package filter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -9,6 +10,8 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.geo.Point;
 import org.springframework.data.geo.Polygon;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,6 +35,10 @@ public class FilterService {
 	{
     	//Apply filters as needed
     	if(f.before != null) {
+    		
+    		//Need to add 1 to the date being compared (SQL handles dates oddly)
+    		f.before = f.before.plusDays(1);
+    		
     		Filter filterBefore = (Filter)entityManager.unwrap(Session.class).enableFilter("beforeDate");
     		filterBefore.setParameter("beforeDate", java.sql.Date.valueOf(f.before));
     	}
@@ -102,7 +109,7 @@ public class FilterService {
     	return poly_string;
 	}
 	
-	public List<Crime> points_within_polygon(CrimeFilter filter)
+	public Page<Crime> points_within_polygon(CrimeFilter filter, Pageable page)
 	{
 		List<LatLong> polygon = filter.getPoints();
     	ArrayList<Point> points = new ArrayList<Point>();
@@ -121,6 +128,9 @@ public class FilterService {
     	
     	poly_string += String.valueOf(poly.getPoints().get(0).getX()) + " " + String.valueOf(poly.getPoints().get(0).getY()) + "))";
     	
-    	return crimeRepository.withinPolygon(poly_string);
+    	System.err.println("Going...");
+    	Page<Crime> response = crimeRepository.withinPolygon(poly_string, page);
+    	System.err.println("Done.");
+    	return response;
 	}
 }

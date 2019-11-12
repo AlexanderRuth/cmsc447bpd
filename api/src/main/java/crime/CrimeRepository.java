@@ -3,6 +3,7 @@ package crime;
 import java.util.List;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.geo.Polygon;
 import org.springframework.data.jpa.repository.Query;
@@ -39,10 +40,11 @@ public interface CrimeRepository extends CrudRepository<Crime, Integer> {
         Iterable<Crime> findAll(Example<Crime> example, Pageable pageRequest);
  
         @Query("SELECT new latlong.LatLong(c.latitude, c.longitude) FROM Crime c")
-        List<LatLong> FindAll(Example<Crime> example);
-        @Query("SELECT new latlong.LatLong(c.latitude, c.longitude) FROM Crime c "
-        		+ "WHERE true = ST_CONTAINS(ST_GeomFromText(?1), Point(c.longitude, c.latitude))")        
-        List<LatLong> FindAll(String polygon);
+        Page<LatLong> FindAll(Example<Crime> example, Pageable page);
+        @Query("SELECT new latlong.LatLong(latitude, longitude) FROM Crime c "
+        		+ "WHERE true = ST_CONTAINS(ST_GeomFromText(?1), Point(c.longitude, c.latitude)) "
+        		+ "GROUP BY latitude, longitude")        
+        Page<LatLong> FindAll(String polygon, Pageable page);
         
         @Query("SELECT new aggregation.Aggregation(c.weapon, COUNT(c)) FROM Crime c "
         		+ "GROUP BY c.weapon")
@@ -95,7 +97,7 @@ public interface CrimeRepository extends CrudRepository<Crime, Integer> {
         
         Crime findFirstByOrderByCrimedateDesc();
         
-        @Query("SELECT new crime.Crime(c.id, c.crimedate, c.crimetime, c.crimecode, c.location, c.description, c.inside_outside, c.weapon, c.post, c.district, c.neighborhood, c.longitude, c.latitude, c.premise, c.total_incidents)"
+        @Query(value = "SELECT new crime.Crime(c.id, c.crimedate, c.crimetime, c.crimecode, c.location, c.description, c.inside_outside, c.weapon, c.post, c.district, c.neighborhood, c.longitude, c.latitude, c.premise, c.total_incidents)"
         		+ " FROM Crime c WHERE true = ST_CONTAINS(ST_GeomFromText(?1), Point(c.longitude, c.latitude))")
-        List<Crime> withinPolygon(String polygon);
+        Page<Crime> withinPolygon(String polygon, Pageable pageRequest);
 }

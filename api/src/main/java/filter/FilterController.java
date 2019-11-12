@@ -55,7 +55,7 @@ public class FilterController {
 	}
 	
 	
-    @CrossOrigin
+    /*@CrossOrigin
 	@PostMapping(path="/filterbyall")
     public @ResponseBody Iterable<Crime> findByAllFilters(@RequestBody CrimeFilter filter)
     	{
@@ -74,7 +74,7 @@ public class FilterController {
     	fs.clear_filters(filter);
     	
     	return response;
-    }
+    }*/
     
     @CrossOrigin
 	@PostMapping(path="/filterbyallpaged")
@@ -87,12 +87,12 @@ public class FilterController {
     	filter.page_number = filter.page_number != null ? filter.page_number : 0;
     	filter.page_size = filter.page_size != null ? filter.page_size : 5;
     	
-    	Pageable page = PageRequest.of(filter.page_number, filter.page_size, Sort.by("post"));
+    	Pageable page = PageRequest.of(filter.page_number, filter.page_size);
     	
     	Iterable<Crime> response;
     	
     	if(filter.points != null)
-    		response = fs.points_within_polygon(filter);
+    		response = fs.points_within_polygon(filter, page);
     	else
     		response = crimeRepository.findAll(Example.of(crime), page); 	
    
@@ -104,19 +104,23 @@ public class FilterController {
 
     @CrossOrigin
     @PostMapping(path="/latlong")
-    public @ResponseBody List<LatLong> latlong(@RequestBody CrimeFilter filter) {
+    public @ResponseBody Iterable<LatLong> latlong(@RequestBody CrimeFilter filter) {
    
     	fs.apply_filters(filter);
 
     	Crime crime = new Crime();
     	String poly_string = filter.points != null ? fs.polygon_string(filter) : null;
+    	filter.page_number = filter.page_number != null ? filter.page_number : 0;
+    	filter.page_size = 50000;
+    	
+    	Pageable page = PageRequest.of(filter.page_number, filter.page_size);
 
-    	List<LatLong> response = null;
+    	Iterable<LatLong> response = null;
     	
     	if(filter.points != null)
-    		response = crimeRepository.FindAll(poly_string);
+    		response = crimeRepository.FindAll(poly_string, page);
     	else
-    		response = crimeRepository.FindAll(Example.of(crime));
+    		response = crimeRepository.FindAll(Example.of(crime), page);
     	
     	fs.clear_filters(filter);
     	
@@ -160,19 +164,6 @@ public class FilterController {
     	Crime crime = crimeRepository.findFirstByOrderByCrimedateDesc();
     	
     	response = crime.getCrimedate();
-    	return response;
-    }
-    
-    @CrossOrigin
-	@PostMapping(path="/polygon")
-    public @ResponseBody List<Crime> getPolygon(@RequestBody CrimeFilter filter) {
-    	
-    	fs.apply_filters(filter);
-  
-    	List<Crime> response = fs.points_within_polygon(filter);
-    	
-    	fs.clear_filters(filter);
-    	
     	return response;
     }
     

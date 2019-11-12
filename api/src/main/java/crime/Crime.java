@@ -25,8 +25,8 @@ import org.hibernate.annotations.ParamDef;
 @FilterDef(name="westOfLongitude", parameters=@ParamDef(name="eastBoundary", type="double"))
 @FilterDef(name="eastOfLongitude", parameters=@ParamDef(name="westBoundary", type="double"))
 @Filters( {
-	@Filter(name="beforeDate", condition=":beforeDate >= crimedate"),
-	@Filter(name="afterDate", condition=":afterDate <= crimedate"),
+	@Filter(name="beforeDate", condition="DATE(crimedate) <= DATE(:beforeDate) "),
+	@Filter(name="afterDate", condition=":afterDate < DATE(crimedate)"),
 	@Filter(name="isWeapon", condition=":weapon = weapon"),
 	@Filter(name="isCrimeCode", condition=":crimecode = crimecode"),
 	@Filter(name="isDistrict", condition=":district = district")
