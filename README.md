@@ -1,6 +1,7 @@
 ### Source Code for CMSC 447 Project
 
-Setup:
+UI Setup:
 
-cd bpd_ui
-npm install
+    cd ./bpd_ui
+
+    npm install
