@@ -1,5 +1,11 @@
 ### Source Code for CMSC 447 Project
 
+## Authors
+
+CMSC 447 Team 12 Fall 2019
+
+Alex Ruth, Wyatt Mumford, Ben Lewis, Justin Pham, and Tom Pollack
+
 ## Installation
 
 Install latest stable version of Node.js
