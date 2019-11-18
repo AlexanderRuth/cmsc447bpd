@@ -9,6 +9,8 @@ import { connect } from 'react-redux';
 import {crimeRequest, crimeResponse} from '../actions/crimeRequest.js';
 import * as Constants from '../constants/constants.js';
 
+const _ = require("lodash");
+
 const headers = ["crimedate", "crimetime", "crimecode", "location", "description", "inside_outside", "weapon", "post", "district", "neighborhood", "longitude", "latitude", "premise", "total_incidents"]
 const PAGE_COUNT = 10;
 
@@ -22,7 +24,7 @@ class CrimeTable extends React.Component
 
 		this.state = {
 			curPage: -1,
-			loading: false
+			loading: false,
 		}
 
 		this.onPageChange = this.onPageChange.bind(this);
@@ -33,9 +35,7 @@ class CrimeTable extends React.Component
 	{
 		//If stopped loading and was loading, reload the data
 		if(!this.props.loading && prevProps.loading)
-		{
 			this.onPageChange(0);
-		}
 	}
 	
 	render()
@@ -49,7 +49,7 @@ class CrimeTable extends React.Component
 					columns={this.dataToColumn()} 
 					defaultPageSize={5}
 					page={this.state.curPage}
-					pages={this.props.numPages ? this.props.numPages : -1}
+					pages={this.state.numPages ? this.state.numPages : -1}
 					manual
 					onPageChange={this.onPageChange}
 					getTdProps={(state, rowInfo, column, instance) => {return {style: {height: "5vh"}}}}
@@ -105,12 +105,12 @@ class CrimeTable extends React.Component
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify(this.props.filters)
+				body: JSON.stringify(filters)
 			}
 		).then(
 			(response) => response.json()
 		).then(
-			(json) => {this.setState({data: json.content, curPage: pageIndex, loading: false})}
+			(json) => {this.setState({numPages: json.totalPages, data: json.content, curPage: pageIndex, loading: false})}
 		)
 	}
 }

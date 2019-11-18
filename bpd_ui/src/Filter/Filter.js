@@ -15,7 +15,8 @@ import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 
 const DISTRICTS = ["ALL", "NORTHERN", "NORTHEAST", "NORTHWEST", "SOUTHERN", "SOUTHEAST", "SOUTHWEST", "CENTRAL", "EASTERN", "WESTERN"];
 const DEFAULT_FILTERS = {
-	after: "2019-09-10"
+	after: "2019-10-01",
+	before: "2019-11-01"
 }
 
 class Filter extends React.Component
@@ -88,7 +89,7 @@ class Filter extends React.Component
 				<div style={{display: this.state.show ? "" : "none", position: "absolute", top: "13vh", zIndex: 2, right: 0, width: "100%"}}>
 				
 				<form style={{textAlign: "left"}}>
-				<Collapse title="Time">
+				{/*<Collapse title="Time">
 						Committed After: 
 						<br/>
 						<input defaultValue={DEFAULT_FILTERS.after} onBlur={this.updateForm} name="after" type="date"/> 
@@ -99,7 +100,7 @@ class Filter extends React.Component
 						<input onBlur={this.updateForm} name="before" type="date"/> 
 						<input onBlur={this.updateForm} name="before_time" type="time"/> EST
 
-				</Collapse>
+		</Collapse>*/}
 				<Collapse title="Crimes">
 					Crimecode:
 					<br/>
@@ -150,15 +151,14 @@ class Filter extends React.Component
 
 		filtersToUse.map(
 			(param) => {
-				filtersAndValues[param] = this.state.form[param];
+				if(param == "after" || param == "before")
+					filtersAndValues[param] = this.props.filters[param] ? this.props.filters[param] : this.state.form[param]
+				else
+					filtersAndValues[param] = this.state.form[param];
 		})
-
-		console.log("THIS.PROPS.FILTERS: ", this.props.filters)
 
 		if(this.props.filters.points)
 			filtersAndValues = Object.assign({}, filtersAndValues, {"points": this.props.filters.points});
-
-		console.log("Filters and Values: ", filtersAndValues)
 
 		//Indicate that a crime request is being made
 		this.props.crimeRequest(filtersAndValues);

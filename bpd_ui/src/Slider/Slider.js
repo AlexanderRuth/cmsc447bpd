@@ -7,12 +7,12 @@ import "./Slider.css";
 
 const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
 const firstDate = new Date(1980, 1, 12);
-const secondDate = new Date(2019, 1, 22);
+const secondDate = new Date(2019, 10, 1);
 
 const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
 
-var startDay = new Date(2019, 1, 12);
-var endDay = new Date(2019, 1, 22);
+var startDay = new Date(2019, 9, 1);
+//var endDay = new Date(2019, 9, 10);
 var MIN = 0
 var MAX = diffDays;
 
@@ -35,10 +35,11 @@ class Slider extends React.Component
     }
     render()
     {
+
         return(
             <div className="slider-container" style={{backgroundColor: "black", height: "100%"}}>
                 <br/>
-                <div style={{color: "white"}}>{this.state.startDay.toDateString()} - {this.state.endDay.toDateString()} </div>
+                <div style={{color: "white"}}>{(this.state.startDay > this.state.endDay ? this.state.endDay : this.state.startDay).toDateString()} - {(this.state.startDay > this.state.endDay ? this.state.startDay : this.state.endDay).toDateString()} </div>
                 <div className="slider-middle" style={{left: this.barStart(), width: this.barWidth()}}></div>
                 <input onMouseUp={this.submitFilter} defaultValue={MAX - 300} max={MAX} min={0} onChange={(e) => this.onValueChanged(e, "left")} className="slider" type="range"/>
                 <input onMouseUp={this.submitFilter} defaultValue={MAX} max={MAX} min={0} className="slider" onChange={(e) => this.onValueChanged(e, "right")} type="range"/>

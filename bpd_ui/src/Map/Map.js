@@ -11,6 +11,8 @@ import memoize from "memoize-one";
 import fetch from 'isomorphic-fetch';
 import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 
+const _ = require("lodash");
+
 class CrimeMap extends React.Component
 {	
 	static defaultProps = {
@@ -60,6 +62,7 @@ class CrimeMap extends React.Component
 
 		var filters = this.props.filters;
 
+		this.setState({loading: true});
 		//Submit the form data
 		fetch(
 			URL,
@@ -74,15 +77,15 @@ class CrimeMap extends React.Component
 			(response) => response.json()
 		).then(
 			//Store the response
-			(response) => {this.setState({data: response}); this.props.crimeResponse(response)}
+			(response) => {this.setState({data: response.content}); this.props.crimeResponse(response)}
 		)
 	}
 	
 	render()
 	{
 		return(
-
-		<div style={{cursor: this.state.canDraw ? "crosshair" : "", height: "100%", width: "100%", filter: this.props.loading ? "blur(1px)" : ""}}>
+		<div style={{cursor: this.state.canDraw ? "crosshair" : "", height: "100%", width: "100%", filter: this.props.loading || this.state.loading ? "blur(2px)" : ""}}>
+			{this.state.loading ? <div className="loader"/> : null}
 			<div style={{color: "black", position: 'absolute', top: 0, right: 0, zIndex: 2}}>
 				{this.state.show ? JSON.stringify(this.props.data[this.state.show]) : ""}
 			</div>
@@ -150,7 +153,6 @@ class CrimeMap extends React.Component
 
 	createHeatmap(data)
 	{
-		console.log("CREATING HEATMAP: ", data)
 		if(!data)
 			return {positions: []}
 		
@@ -158,7 +160,8 @@ class CrimeMap extends React.Component
 			positions: [],
 			options: {
 				opacity: .8,
-				weight: 50
+				weight: 10,
+				maxIntensity: 30
 			}
 		}
 		
@@ -171,6 +174,7 @@ class CrimeMap extends React.Component
 		}
 
 		this.heatmapData = heatmapData;
+		this.setState({loading: false})
 		return heatmapData;
 	}
 
@@ -385,7 +389,7 @@ class CrimeMap extends React.Component
 			(response) => response.json()
 		).then(
 			//Store the response
-			(response) => {this.setState({data: response}); this.props.crimeResponse(response)}
+			(response) => {this.setState({data: response.content}); this.props.crimeResponse(response)}
 		)
 
 		this._mapDrawingPolygon.setMap(null);
@@ -396,6 +400,7 @@ class CrimeMap extends React.Component
 
 	finishPolyline()
 	{
+
 		if(!this._mapDrawing || !this.state.drawing)
 			return;
 			
@@ -428,6 +433,7 @@ class CrimeMap extends React.Component
 
 		var URL = Constants.API_URL + Constants.LATLONG;
 
+		this.setState({loading: true});
 		//Submit the form data
 		fetch(
 			URL,
@@ -442,7 +448,7 @@ class CrimeMap extends React.Component
 			(response) => response.json()
 		).then(
 			//Store the response
-			(response) => {this.setState({data: response}); this.props.crimeResponse(response)}
+			(response) => {this.setState({data: response.content}); this.props.crimeResponse(response)}
 		)
 
 		this.setState({drawSelection: true, drawing: false});
@@ -455,7 +461,8 @@ class CrimeMap extends React.Component
 const mapStateToProps = (state) => {
 	return {
 		loading: state.crimeReducer.loading,
-		filters: state.crimeReducer.filters
+		filters: state.crimeReducer.filters,
+		data: state.crimeReducer.crimes,
 	}
 }
 
