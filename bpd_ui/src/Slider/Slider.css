@@ -8,6 +8,7 @@
     width: 100%;
     top: 50%;
     left: 0px;
+    height: 25px;
     pointer-events: none;
     z-index: 0;
     background: none;
@@ -29,6 +30,36 @@
     outline: 0;
     position: relative;
     border: 1px solid black;
+}
+
+.slider::-moz-range-thumb{
+    appearance: none;
+    z-index: 10;
+    pointer-events: all;
+    width: 25px;
+    height: 25px;
+    background: gold;
+    cursor: pointer;
+    border: none;
+    outline: 0;
+    position: relative;
+    border: 1px solid black;
+    border-radius: 0;   
+}
+
+.slider::-ms-thumb{
+    -webkit-appearance: none;
+    z-index: 10;
+    pointer-events: all;
+    width: 25px;
+    height: 25px;
+    background: gold;
+    cursor: pointer;
+    border: none;
+    outline: 0;
+    position: relative;
+    border: 1px solid black;
+    border-radius: 0;  
 }
 
 .slider-middle{

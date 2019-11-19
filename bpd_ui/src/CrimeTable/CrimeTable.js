@@ -25,6 +25,7 @@ class CrimeTable extends React.Component
 		this.state = {
 			curPage: -1,
 			loading: false,
+			pageSize: 5			//Default to five
 		}
 
 		this.onPageChange = this.onPageChange.bind(this);
@@ -52,8 +53,10 @@ class CrimeTable extends React.Component
 					pages={this.state.numPages ? this.state.numPages : -1}
 					manual
 					onPageChange={this.onPageChange}
-					getTdProps={(state, rowInfo, column, instance) => {return {style: {height: "5vh"}}}}
-					getTfootTrProps={() => {return {style: {height: "0vh"}}}}/>
+					onPageSizeChange={
+						(pageSize, pageIndex) => {this.setState({pageSize: pageSize}, this.onPageChange(pageIndex, pageSize))}}
+					style={{height: "37vh"}}	
+					/>
 			</div>
 		</div>
 		);
@@ -89,12 +92,16 @@ class CrimeTable extends React.Component
 		);
 	}
 
-	onPageChange(pageIndex)
+	onPageChange(pageIndex, pageSize=null)
 	{
 		var filters = this.props.filters;
 		filters["page_number"] = pageIndex;
-		filters["page_size"] = 5;
 		
+		if(!pageSize)
+			filters["page_size"] = this.state.pageSize;
+		else
+			filters["page_size"] = pageSize;
+
 		console.log("GOING");
 		var URL = Constants.API_URL + Constants.FILTER;
 		this.setState({loading: true});
