@@ -87,7 +87,19 @@ public class FilterController {
     	filter.page_number = filter.page_number != null ? filter.page_number : 0;
     	filter.page_size = filter.page_size != null ? filter.page_size : 5;
     	
-    	Pageable page = PageRequest.of(filter.page_number, filter.page_size);
+    	Pageable page;
+    	
+    	//Sort or not sort, depending on the request
+    	if(filter.sort_by != null) {
+    		
+    		//If desc requested, sort descending, otherwise, default to sort ascending
+    		if(filter.sort_direction != null && filter.sort_direction.toLowerCase().contentEquals("desc"))
+    				page = PageRequest.of(filter.page_number, filter.page_size, Sort.by(filter.sort_by).descending());
+    		else
+    			page = PageRequest.of(filter.page_number, filter.page_size, Sort.by(filter.sort_by));
+    	}
+    	else
+    		page = PageRequest.of(filter.page_number, filter.page_size);
     	
     	Iterable<Crime> response;
     	

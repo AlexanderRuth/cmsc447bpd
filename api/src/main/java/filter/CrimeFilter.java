@@ -15,6 +15,8 @@ public class CrimeFilter {
 	public Integer page_number;
 	public Integer page_size;
 	public String group_by;
+	public String sort_by;
+	public String sort_direction;
 	
 	
 	public java.time.LocalDate getBefore() {
@@ -79,5 +81,29 @@ public class CrimeFilter {
 
 	public void setPage_size(Integer page_size) {
 		this.page_size = page_size;
+	}
+
+	public String getGroup_by() {
+		return group_by;
+	}
+
+	public void setGroup_by(String group_by) {
+		this.group_by = group_by;
+	}
+
+	public String getSort_by() {
+		return sort_by;
+	}
+
+	public void setSort_by(String sort_by) {
+		this.sort_by = sort_by;
+	}
+
+	public String getSort_direction() {
+		return sort_direction;
+	}
+
+	public void setSort_direction(String sort_direction) {
+		this.sort_direction = sort_direction;
 	}
 }

@@ -97,7 +97,7 @@ public interface CrimeRepository extends CrudRepository<Crime, Integer> {
         
         Crime findFirstByOrderByCrimedateDesc();
         
-        @Query(value = "SELECT new crime.Crime(c.id, c.crimedate, c.crimetime, c.crimecode, c.location, c.description, c.inside_outside, c.weapon, c.post, c.district, c.neighborhood, c.longitude, c.latitude, c.premise, c.total_incidents)"
+        @Query(value = "SELECT new crime.Crime(c.id, c.crimedate, c.crimetime, c.crimecode, c.location, c.description, c.insideOutside, c.weapon, c.post, c.district, c.neighborhood, c.longitude, c.latitude, c.premise, c.total_incidents)"
         		+ " FROM Crime c WHERE true = ST_CONTAINS(ST_GeomFromText(?1), Point(c.longitude, c.latitude))")
         Page<Crime> withinPolygon(String polygon, Pageable pageRequest);
 }

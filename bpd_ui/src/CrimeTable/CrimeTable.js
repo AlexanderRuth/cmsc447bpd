@@ -11,7 +11,7 @@ import * as Constants from '../constants/constants.js';
 
 const _ = require("lodash");
 
-const headers = ["crimedate", "crimetime", "crimecode", "location", "description", "inside_outside", "weapon", "post", "district", "neighborhood", "longitude", "latitude", "premise", "total_incidents"]
+const headers = ["crimedate", "crimetime", "crimecode", "location", "description", "insideOutside", "weapon", "post", "district", "neighborhood", "longitude", "latitude", "premise"]
 const PAGE_COUNT = 10;
 
 
@@ -29,6 +29,7 @@ class CrimeTable extends React.Component
 		}
 
 		this.onPageChange = this.onPageChange.bind(this);
+		this.onSortedChange = this.onSortedChange.bind(this);
 	}
 
 	//Update the rendered data
@@ -55,6 +56,7 @@ class CrimeTable extends React.Component
 					onPageChange={this.onPageChange}
 					onPageSizeChange={
 						(pageSize, pageIndex) => {this.setState({pageSize: pageSize}, this.onPageChange(pageIndex, pageSize))}}
+					onSortedChange={this.onSortedChange}
 					style={{height: "37vh"}}	
 					/>
 			</div>
@@ -85,7 +87,7 @@ class CrimeTable extends React.Component
 			(key) => {
 				return {
 					Header: key,
-					accessor: key.toLowerCase(),
+					accessor: key,
 					sort: 'asc'
 				}
 			}
@@ -101,6 +103,9 @@ class CrimeTable extends React.Component
 			filters["page_size"] = this.state.pageSize;
 		else
 			filters["page_size"] = pageSize;
+
+		filters["sort_by"] = this.state.sort_by ? this.state.sort_by : null;
+		filters["sort_direction"] = this.state.sort_direction ? this.state.sort_direction : null;
 
 		console.log("GOING");
 		var URL = Constants.API_URL + Constants.FILTER;
@@ -119,6 +124,14 @@ class CrimeTable extends React.Component
 		).then(
 			(json) => {this.setState({numPages: json.totalPages, data: json.content, curPage: pageIndex, loading: false})}
 		)
+	}
+
+	onSortedChange(newSorted, column, shiftKey)
+	{
+		if(!newSorted[0])
+			this.setState({sort_by: null, sort_direction: null}, () => this.onPageChange(0))
+		else
+			this.setState({sort_by: newSorted[0].id, sort_direction: newSorted[0].desc ? "desc" : "asc"}, () => this.onPageChange(0))
 	}
 }
 

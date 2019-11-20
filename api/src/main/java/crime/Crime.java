@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,7 +49,7 @@ public class Crime {
 		this.crimecode = crimecode;
 		this.location = location;
 		this.description = description;
-		this.inside_outside = inside_outside;
+		this.insideOutside = inside_outside;
 		this.weapon = weapon;
 		this.post = post;
 		this.district = district;
@@ -67,7 +68,9 @@ public class Crime {
     private String crimecode;
     private String location;
     private String description;
-    private String inside_outside;
+    
+    @Column(name = "inside_outside")
+    private String insideOutside;
     private String weapon;
     private Integer post;
     private String district;
@@ -112,12 +115,6 @@ public class Crime {
 	}
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	public String getInside_outside() {
-		return inside_outside;
-	}
-	public void setInside_outside(String inside_outside) {
-		this.inside_outside = inside_outside;
 	}
 	public String getWeapon() {
 		return weapon;
@@ -166,5 +163,13 @@ public class Crime {
 	}
 	public void setTotal_incidents(Integer total_incidents) {
 		this.total_incidents = total_incidents;
+	}
+
+	public String getInsideOutside() {
+		return insideOutside;
+	}
+
+	public void setInsideOutside(String insideOutside) {
+		this.insideOutside = insideOutside;
 	}
 }
