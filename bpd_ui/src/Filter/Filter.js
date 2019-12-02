@@ -16,7 +16,6 @@ import {crimeResponse, crimeRequest} from '../actions/crimeRequest.js';
 const DISTRICTS = ["ALL", "NORTHERN", "NORTHEAST", "NORTHWEST", "SOUTHERN", "SOUTHEAST", "SOUTHWEST", "CENTRAL", "EASTERN", "WESTERN"];
 const DEFAULT_FILTERS = {
 	after: "2019-10-01",
-	before: "2019-11-01"
 }
 
 class Filter extends React.Component

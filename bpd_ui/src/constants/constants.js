@@ -3,6 +3,7 @@ export const API_URL = "http://ec2-54-197-212-25.compute-1.amazonaws.com/api/cri
 export const FILTER = "/filterbyallpaged";
 export const AGGREGATE = "/count";
 export const LATLONG = "/latlong";
+export const LATESTDATE = "/latestdate";
 
 //Google Maps API Key
 export const API_KEY = "AIzaSyA7Q_McK_Ac4nTs0oaphr0-6VUHPjqiOfE";
