@@ -1,0 +1,4 @@
+# JDBC driver (comma-separated list)
+jdbcDriver=com.mysql.jdbc.Driver
+
+INT=5
