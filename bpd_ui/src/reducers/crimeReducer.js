@@ -9,6 +9,8 @@ export default (state = {}, action) => {
             return Object.assign({}, state, action.payload);
         case Constants.CRIME_RESPONSE:
             return Object.assign({}, state, action.payload);
+        case Constants.RELOAD:
+            return Object.assign({}, state, action.payload);
         default:
             return state;
     }

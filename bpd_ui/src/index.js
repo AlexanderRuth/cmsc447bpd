@@ -7,11 +7,14 @@ import '../node_modules/font-awesome/css/font-awesome.min.css';
 
 import { Provider } from 'react-redux'
 import configureStore from './store';
+import { BrowserRouter as Router} from 'react-router-dom';
 
 
 ReactDOM.render(
 <Provider store={configureStore({loading: false, crimes: [], filters: {}})}>
-    <App />
+    <Router>
+        <App />
+    </Router>
 </Provider>, 
 document.getElementById('root'));
 

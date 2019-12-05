@@ -2,9 +2,12 @@ import React from 'react';
 import "./Header.css";
 import logo from "../img/umbc_logo.png";
 import {Link} from "react-router-dom";
+import {loading} from '../actions/crimeRequest.js';
+import {connect} from 'react-redux';
 
 var headerItems = {
-	"Home": "/home",
+	"Home": "/",
+	"Predict": "/predict"
 }
 
 export default class Header extends React.Component

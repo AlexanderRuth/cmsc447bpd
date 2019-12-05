@@ -26,3 +26,12 @@ export const crimeResponse = (data, numPages) => {
         payload: payload
     }
 }
+
+export const loading = (isLoading) => {
+    return {
+        type: Constants.RELOAD,
+        payload: {
+            loading: isLoading
+        }
+    }
+}
